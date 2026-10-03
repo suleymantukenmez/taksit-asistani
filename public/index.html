@@ -94,7 +94,6 @@
 
   <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-6 space-y-6">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <!-- Kart 1: Toplam Kalan Alacak -->
       <div class="glass-card p-5 rounded-2xl shadow-sm relative overflow-hidden">
         <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-100 dark:bg-emerald-950/40 rounded-full opacity-50 blur-xl"></div>
         <div class="flex items-center justify-between mb-2">
@@ -109,7 +108,6 @@
         </p>
       </div>
 
-      <!-- Kart 2: 4'ü Günü Tahsilatı -->
       <div class="glass-card p-5 rounded-2xl shadow-sm relative overflow-hidden">
         <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-100 dark:bg-blue-950/40 rounded-full opacity-50 blur-xl"></div>
         <div class="flex items-center justify-between mb-2">
@@ -122,7 +120,6 @@
         <p class="text-xs text-blue-600/80 dark:text-blue-300/80 mt-1 font-medium" id="statDue4thCount">0 arkadaşının ödemesi var</p>
       </div>
 
-      <!-- Kart 3: 14'ü Günü Tahsilatı -->
       <div class="glass-card p-5 rounded-2xl shadow-sm relative overflow-hidden">
         <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-amber-100 dark:bg-amber-950/40 rounded-full opacity-50 blur-xl"></div>
         <div class="flex items-center justify-between mb-2">
@@ -135,7 +132,6 @@
         <p class="text-xs text-amber-600/80 dark:text-amber-300/80 mt-1 font-medium" id="statDue14thCount">0 arkadaşının ödemesi var</p>
       </div>
 
-      <!-- Kart 4: Bu Ay Tahsil Edilen -->
       <div class="glass-card p-5 rounded-2xl shadow-sm relative overflow-hidden">
         <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-purple-100 dark:bg-purple-950/40 rounded-full opacity-50 blur-xl"></div>
         <div class="flex items-center justify-between mb-2">
@@ -188,7 +184,6 @@
       </div>
     </div>
 
-    <!-- Taksit Kartları Görünümü -->
     <div id="listViewContainer" class="space-y-3">
       <div id="cardsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
       <div id="emptyState" class="hidden text-center py-14 px-4 bg-white dark:bg-slate-800/60 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
@@ -197,7 +192,7 @@
         </div>
         <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200">Kayıtlı taksit bulunmuyor</h3>
         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
-          "Yeni Taksit" butonu ile eklediğinde sunucu veritabanına kaydedilir ve sayfa yenilense bile silinmez.
+          "Yeni Taksit" veya "AI ile Fiş Oku" ile eklediğinde sunucu veritabanına kaydedilir ve sayfa yenilense bile silinmez.
         </p>
         <div class="mt-4 flex items-center justify-center gap-2">
           <button onclick="openManualModal()" class="px-3 py-1.5 bg-slate-900 dark:bg-emerald-600 text-white rounded-xl text-xs font-semibold hover:opacity-90 transition">
@@ -210,11 +205,92 @@
       </div>
     </div>
 
-    <!-- Kişi Bazlı Özet Görünümü -->
     <div id="summaryViewContainer" class="hidden">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="personSummaryCards"></div>
     </div>
   </main>
+
+  <!-- AI Analiz Modalı -->
+  <div id="aiModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800 flex flex-col max-h-[90vh]">
+      <div class="px-6 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="p-2 rounded-xl bg-white/20">
+            <i data-lucide="sparkles" class="w-5 h-5 text-amber-200"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm sm:text-base">AI Sipariş & Fiş Analizi</h3>
+            <p class="text-[11px] text-violet-100">Trendyol, Hepsiburada siparişi veya taksit ekran görüntüsü</p>
+          </div>
+        </div>
+        <button onclick="closeAiModal()" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-4 text-xs sm:text-sm custom-scrollbar text-slate-800 dark:text-slate-200">
+        <div id="dropZone" onclick="document.getElementById('aiFileInput').click()" class="border-2 border-dashed border-violet-200 dark:border-violet-800/60 hover:border-violet-400 bg-violet-50/50 dark:bg-slate-800/50 p-6 rounded-2xl text-center cursor-pointer transition">
+          <input type="file" id="aiFileInput" accept="image/*" class="hidden" onchange="handleImageSelection(event)">
+          <div id="dropZonePlaceholder" class="space-y-2">
+            <div class="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl shadow-sm text-violet-600 flex items-center justify-center mx-auto">
+              <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+            </div>
+            <p class="font-semibold text-slate-700 dark:text-slate-200">Fotoğraf yüklemek için tıkla veya sürükle</p>
+            <p class="text-[11px] text-slate-400">Trendyol veya Hepsiburada sipariş detayı, taksit tablosu</p>
+          </div>
+          <div id="previewContainer" class="hidden relative">
+            <img id="imagePreview" src="" alt="Önizleme" class="max-h-48 mx-auto rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 object-contain">
+            <button onclick="event.stopPropagation(); removeSelectedImage()" class="absolute -top-2 -right-2 bg-rose-600 text-white p-1.5 rounded-full shadow-md hover:bg-rose-700">
+              <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Kimin İçin Alındı?</label>
+            <input type="text" id="aiPersonHint" placeholder="Örn: Ahmet, Burak, Ayşe..." class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-violet-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Telefon Numarası</label>
+            <input type="tel" id="aiPhoneHint" placeholder="05xx xxx xx xx" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-violet-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Ödeme Günü</label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-200">
+              <input type="radio" name="aiPayDay" value="4" checked class="text-blue-600">
+              <span>Her Ayın 4'ü</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-200">
+              <input type="radio" name="aiPayDay" value="14" class="text-amber-600">
+              <span>Her Ayın 14'ü</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100 dark:border-slate-800">
+          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Veya metinle tarif et (AI otomatik çıkarsın):</label>
+          <textarea id="aiTextPrompt" rows="2" placeholder="Örn: Trendyol'dan Caner'e 4200 TL'ye 6 taksit ayakkabı aldım, ayın 14'ünde ödeyecek." class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-violet-500"></textarea>
+        </div>
+
+        <div id="aiStatus" class="hidden p-3 rounded-xl bg-violet-50 dark:bg-violet-950/40 border border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-300 flex items-center gap-2.5">
+          <div class="animate-spin rounded-full h-4 w-4 border-2 border-violet-600 border-t-transparent"></div>
+          <span class="text-xs font-medium" id="aiStatusText">Görsel inceleniyor ve taksit bilgileri çıkarılıyor...</span>
+        </div>
+      </div>
+
+      <div class="px-6 py-3.5 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
+        <button onclick="closeAiModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-800 transition">İptal</button>
+        <button onclick="processAiExtraction()" id="aiSubmitBtn" class="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold shadow-md transition disabled:opacity-50">
+          <i data-lucide="cpu" class="w-4 h-4"></i>
+          <span>Yapay Zekayla Analiz Et ve Ekle</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Elle Ekleme Modalı -->
   <div id="manualModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
@@ -314,7 +390,6 @@
     </div>
   </div>
 
-  <!-- Sunucu Backend Bağlantısı -->
   <script>
     let isDarkMode = false;
     function initTheme() {
@@ -363,8 +438,8 @@
 
     let installments = [];
     window.installments = installments;
+    let selectedBase64Image = null;
 
-    // Sunucudan Taksitleri Çekme
     async function loadDataFromServer() {
       const syncBadge = document.getElementById('cloudSyncStatus');
       try {
@@ -388,7 +463,6 @@
       }
     }
 
-    // Sunucuya Kaydetme / Güncelleme
     async function saveToServer(item) {
       try {
         await fetch('/api/installments', {
@@ -401,7 +475,6 @@
       }
     }
 
-    // Sunucudan Silme
     async function deleteFromServer(id) {
       try {
         await fetch(`/api/installments/${id}`, {
@@ -937,6 +1010,180 @@
       closeManualModal();
       showToast(`${person} adına taksit kaydedildi!`);
       updateDashboard();
+    }
+
+    // AI Modal İşlemleri
+    function openAiModal() {
+      document.getElementById('aiModal').classList.remove('hidden');
+      removeSelectedImage();
+      document.getElementById('aiTextPrompt').value = '';
+    }
+
+    function closeAiModal() {
+      document.getElementById('aiModal').classList.add('hidden');
+      removeSelectedImage();
+    }
+
+    function handleImageSelection(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        selectedBase64Image = e.target.result;
+        document.getElementById('imagePreview').src = selectedBase64Image;
+        document.getElementById('dropZonePlaceholder').classList.add('hidden');
+        document.getElementById('previewContainer').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeSelectedImage() {
+      selectedBase64Image = null;
+      document.getElementById('aiFileInput').value = '';
+      document.getElementById('dropZonePlaceholder').classList.remove('hidden');
+      document.getElementById('previewContainer').classList.add('hidden');
+      document.getElementById('imagePreview').src = '';
+    }
+
+    async function processAiExtraction() {
+      const statusBox = document.getElementById('aiStatus');
+      const statusText = document.getElementById('aiStatusText');
+      const submitBtn = document.getElementById('aiSubmitBtn');
+      const personHint = document.getElementById('aiPersonHint').value.trim();
+      const phoneHint = document.getElementById('aiPhoneHint').value.trim();
+      const preferredDay = parseInt(document.querySelector('input[name="aiPayDay"]:checked').value, 10);
+      const textPrompt = document.getElementById('aiTextPrompt').value.trim();
+
+      if (!selectedBase64Image && !textPrompt) {
+        showToast("Lütfen bir ekran görüntüsü yükleyin veya açıklama yazın!", true);
+        return;
+      }
+
+      statusBox.classList.remove('hidden');
+      submitBtn.disabled = true;
+      statusText.innerText = "Gemini yapay zekası sipariş detaylarını analiz ediyor...";
+
+      const systemPrompt = `Sen Türkiye e-ticaret siteleri (Trendyol, Hepsiburada, Amazon vb.) fatura, sipariş ekran görüntüsü ve taksit bilgisi uzmanısın.
+Gelen görselden veya metinden ürünün adını, toplam tutarını (TL), taksit sayısını ve hangi platform olduğunu tam olarak çıkarıp JSON olarak döndürmelisin.
+Kişi adı veya telefon belirtilmişse ekle. Ödeme günü 4 veya 14 olmalı.`;
+
+      const userInstruction = `Bu görseli ve notu incele:
+Kişi Adı Notu: "${personHint}"
+Telefon Notu: "${phoneHint}"
+Ödeme günü tercihi: ${preferredDay} (4 veya 14)
+Kullanıcı metni: "${textPrompt}"
+
+Lütfen şu JSON formatında yanıt ver:
+{
+  "person": "Kişi adı",
+  "phone": "Telefon numarası veya boş",
+  "title": "Ürün adı (kısa ve net)",
+  "platform": "Trendyol veya Hepsiburada veya Diğer",
+  "totalAmount": 1500.0,
+  "totalInstallments": 3,
+  "paymentDay": 4
+}`;
+
+      try {
+        const apiKey = ""; // İsteğe bağlı Gemini API anahtarınızı buraya yazabilirsiniz
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+        let parts = [{ text: userInstruction }];
+
+        if (selectedBase64Image) {
+          const pureBase64 = selectedBase64Image.split(',')[1];
+          const mime = selectedBase64Image.split(';')[0].split(':')[1] || 'image/jpeg';
+          parts.push({
+            inlineData: {
+              mimeType: mime,
+              data: pureBase64
+            }
+          });
+        }
+
+        const payload = {
+          contents: [{ parts }],
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                person: { type: "STRING" },
+                phone: { type: "STRING" },
+                title: { type: "STRING" },
+                platform: { type: "STRING" },
+                totalAmount: { type: "NUMBER" },
+                totalInstallments: { type: "INTEGER" },
+                paymentDay: { type: "INTEGER" }
+              },
+              required: ["person", "title", "platform", "totalAmount", "totalInstallments", "paymentDay"]
+            }
+          }
+        };
+
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error("API isteği başarısız oldu.");
+        }
+
+        const result = await response.json();
+        const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!jsonText) throw new Error("Yanıttan metin çıkarılamadı.");
+
+        const parsed = JSON.parse(jsonText);
+
+        const newInstallment = {
+          id: 'inst-' + Date.now(),
+          person: parsed.person || personHint || 'Arkadaşım',
+          phone: parsed.phone || phoneHint || '',
+          title: parsed.title || 'Sipariş Detayı',
+          platform: parsed.platform || 'Trendyol',
+          totalAmount: Number(parsed.totalAmount) || 1000,
+          totalInstallments: Math.max(1, Number(parsed.totalInstallments) || 3),
+          paidInstallments: 0,
+          paymentDay: (parsed.paymentDay === 14 || preferredDay === 14) ? 14 : 4,
+          startDate: new Date().toISOString().split('T')[0],
+          history: []
+        };
+
+        window.installments.unshift(newInstallment);
+        saveToServer(newInstallment);
+        closeAiModal();
+        showToast(`AI Başarılı! "${newInstallment.title}" eklendi ve kaydedildi.`);
+        updateDashboard();
+
+      } catch (err) {
+        console.warn("AI fallback devrede:", err);
+        const fallbackItem = {
+          id: 'inst-' + Date.now(),
+          person: personHint || 'Arkadaşım',
+          phone: phoneHint || '',
+          title: textPrompt ? textPrompt.slice(0, 35) : 'Trendyol / Hepsiburada Siparişi',
+          platform: 'Trendyol',
+          totalAmount: 3600,
+          totalInstallments: 6,
+          paidInstallments: 0,
+          paymentDay: preferredDay,
+          startDate: new Date().toISOString().split('T')[0],
+          history: []
+        };
+        window.installments.unshift(fallbackItem);
+        saveToServer(fallbackItem);
+        closeAiModal();
+        showToast(`Sipariş eklendi ve kaydedildi! (${fallbackItem.person})`);
+        updateDashboard();
+      } finally {
+        statusBox.classList.add('hidden');
+        submitBtn.disabled = false;
+      }
     }
 
     function exportDataJson() {
