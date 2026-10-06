@@ -25,38 +25,49 @@
     body { background: radial-gradient(circle at top right, #111a30, #090d16 70%); color: var(--text); min-height: 100vh; padding: 16px; display: flex; justify-content: center; }
     .container { width: 100%; max-width: 960px; padding-bottom: 60px; }
     
-    /* Header & Admin Bar */
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
-    .brand-title { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    /* Header ve Saat Alanı */
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
+    .brand-title { font-size: 1.45rem; font-weight: 800; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .live-clock-box { display: flex; align-items: center; gap: 10px; background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border); padding: 6px 14px; border-radius: 12px; }
+    .clock-time { font-size: 1.1rem; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; }
+    .clock-date { font-size: 0.75rem; color: var(--muted); border-left: 1px solid var(--border); padding-left: 8px; }
+    
     .admin-pill { background: rgba(255,255,255,0.06); border: 1px solid var(--border); padding: 6px 14px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 6px; }
     .admin-pill:hover { border-color: var(--primary); transform: translateY(-1px); }
     .admin-pill.active { background: rgba(56, 189, 248, 0.15); border-color: var(--primary); color: var(--primary); }
 
+    /* Canlı Gün Sayacı */
+    .countdown-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .countdown-card { background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(129, 140, 248, 0.08)); border: 1px solid var(--border-glow); border-radius: 14px; padding: 12px; text-align: center; }
+    .countdown-title { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; font-weight: 600; }
+    .countdown-val { font-size: 1.25rem; font-weight: 800; color: #fff; margin-top: 4px; }
+    .countdown-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; background: rgba(56, 189, 248, 0.2); color: var(--primary); margin-top: 4px; }
+
     /* Özet Paneli */
     .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px; }
-    .stat-card { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 16px; padding: 18px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.2); transition: transform 0.3s ease; }
-    .stat-card:hover { transform: translateY(-3px); border-color: var(--border-glow); }
+    .stat-card { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 16px; padding: 16px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
     .stat-title { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-    .stat-val { font-size: 1.5rem; font-weight: 800; color: var(--primary); margin-top: 6px; }
+    .stat-val { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-top: 6px; }
 
-    /* Admin Ekleme Kartı */
+    /* Admin Kartı */
     #adminPanelSection { display: none; margin-bottom: 28px; animation: slideDown 0.4s ease; }
     @keyframes slideDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
     .card-glass { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 18px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
     
+    /* Mobil Uyumlu Şeffaf Input OCR Butonları */
     .ocr-box { background: rgba(56, 189, 248, 0.04); border: 1px dashed var(--primary); border-radius: 12px; padding: 14px; margin-bottom: 18px; text-align: center; }
-    .btn-file { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #2563eb, #38bdf8); color: #fff; padding: 11px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
-    .btn-file:hover { opacity: 0.9; }
-    
+    .btn-file-wrapper { position: relative; display: inline-block; margin: 4px; }
+    .btn-file-view { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 0.85rem; color: #fff; pointer-events: none; }
+    .btn-file-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+
     .form-group { margin-bottom: 14px; }
     label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
-    input, select { width: 100%; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--border); background: #0b1120; color: #fff; font-size: 0.95rem; outline: none; transition: 0.2s; }
+    input, select { width: 100%; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--border); background: #0b1120; color: #fff; font-size: 0.95rem; outline: none; }
     input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(56, 189, 248, 0.25); }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .btn-submit { width: 100%; background: linear-gradient(135deg, #38bdf8, #818cf8); color: #090d16; font-weight: 800; padding: 13px; border: none; border-radius: 10px; cursor: pointer; font-size: 1rem; margin-top: 8px; transition: 0.3s; }
-    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(56, 189, 248, 0.3); }
+    .btn-submit { width: 100%; background: linear-gradient(135deg, #38bdf8, #818cf8); color: #090d16; font-weight: 800; padding: 13px; border: none; border-radius: 10px; cursor: pointer; font-size: 1rem; margin-top: 8px; }
 
-    /* Kolonlar: Ayın 4'ü ve 14'ü */
+    /* Kolonlar */
     .groups-wrapper { display: grid; grid-template-columns: 1fr; gap: 20px; }
     @media (min-width: 800px) { .groups-wrapper { grid-template-columns: 1fr 1fr; } }
     .column { background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 18px; padding: 18px; }
@@ -64,28 +75,22 @@
     .col-title { font-size: 1.15rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
     .badge { font-size: 0.75rem; padding: 3px 9px; border-radius: 6px; background: rgba(56, 189, 248, 0.15); color: var(--primary); }
 
-    /* Taksit Kartı */
-    .item-card { background: var(--card-inner); border: 1px solid var(--border); border-radius: 14px; padding: 15px; margin-bottom: 14px; transition: 0.3s ease; }
-    .item-card:hover { border-color: var(--border-glow); transform: translateY(-2px); }
+    /* Taksit Kartları */
+    .item-card { background: var(--card-inner); border: 1px solid var(--border); border-radius: 14px; padding: 15px; margin-bottom: 14px; }
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
     .person-name { font-weight: 700; font-size: 1.05rem; color: #fff; }
     .item-price { font-weight: 800; font-size: 1.15rem; color: var(--primary); }
-    
-    /* İlerleme Çubuğu */
     .progress-bar-wrap { width: 100%; height: 7px; background: #1e293b; border-radius: 99px; margin: 10px 0; overflow: hidden; }
-    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #38bdf8, #10b981); border-radius: 99px; transition: width 0.4s ease; }
-
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #38bdf8, #10b981); border-radius: 99px; }
     .meta-line { font-size: 0.85rem; color: var(--muted); margin: 3px 0; }
     .meta-end-date { color: #f59e0b; font-weight: 600; font-size: 0.85rem; margin-top: 4px; }
     
     .actions-bar { display: flex; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); }
-    .btn-act { flex: 1; padding: 8px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; text-decoration: none; transition: 0.2s; }
+    .btn-act { flex: 1; padding: 8px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; text-decoration: none; }
     .btn-wa { background: var(--wa); color: #090d16; }
     .btn-pay { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid var(--success); }
-    .btn-pay:hover { background: var(--success); color: #090d16; }
     .btn-del { background: rgba(244, 63, 94, 0.15); color: var(--danger); border: 1px solid var(--danger); }
 
-    /* Footer */
     footer { text-align: center; margin-top: 50px; font-size: 0.9rem; color: var(--muted); letter-spacing: 0.5px; }
     footer span { color: var(--primary); font-weight: 700; }
   </style>
@@ -97,10 +102,31 @@
       <div class="brand-title">Taksit & Tahsilat Asistanı</div>
       <div id="statusText" style="font-size: 0.75rem; color: var(--success); margin-top: 4px;">● Veritabanı Bulutta Aktif</div>
     </div>
+
+    <!-- Canlı Dijital Saat ve Tarih -->
+    <div class="live-clock-box">
+      <div class="clock-time" id="liveClock">00:00:00</div>
+      <div class="clock-date" id="liveDate">Yükleniyor...</div>
+    </div>
+
     <div id="adminToggleBtn" class="admin-pill" onclick="handleAdminToggle()">
       <span>🔒</span> <span id="adminToggleText">Yönetici Girişi</span>
     </div>
   </header>
+
+  <!-- GÜN SAYACI KARTLARI -->
+  <div class="countdown-grid">
+    <div class="countdown-card">
+      <div class="countdown-title">📅 Ayın 4'üne Kalan</div>
+      <div class="countdown-val" id="daysUntil4">Hesaplanıyor...</div>
+      <span class="countdown-badge" id="badgeDay4">Sıradaki Ödeme</span>
+    </div>
+    <div class="countdown-card">
+      <div class="countdown-title">📅 Ayın 14'üne Kalan</div>
+      <div class="countdown-val" id="daysUntil14">Hesaplanıyor...</div>
+      <span class="countdown-badge" id="badgeDay14">Sıradaki Ödeme</span>
+    </div>
+  </div>
 
   <!-- Özet Kartları -->
   <div class="summary-grid">
@@ -118,17 +144,32 @@
     </div>
   </div>
 
-  <!-- YÖNETİCİ TAKSİT EKLEME PANELİ (Sadece Admin Açınca Görünür) -->
+  <!-- YÖNETİCİ TAKSİT EKLEME PANELİ -->
   <div id="adminPanelSection">
     <div class="card-glass">
       <h3 style="margin-bottom: 14px; font-size: 1.1rem; color: var(--primary);">➕ Yeni Taksit Tanımla</h3>
       
+      <!-- Mobilde Kesin Çalışan Çift Butonlu OCR Alanı -->
       <div class="ocr-box">
-        <input type="file" id="receiptFileInput" accept="image/*" style="display: none;" onchange="processReceipt(event)">
-        <label for="receiptFileInput" class="btn-file">
-          📷 Fiş / Makbuz Tara (Kamera / Galeri)
-        </label>
-        <div id="ocrStatus" style="display: none; font-size: 0.8rem; color: var(--primary); margin-top: 8px;">Fiş analiz ediliyor...</div>
+        <div style="font-size: 0.85rem; font-weight: 600; color: var(--primary); margin-bottom: 10px;">
+          🧾 Fiş veya Fatura Okuma
+        </div>
+        
+        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+          <div class="btn-file-wrapper">
+            <div class="btn-file-view" style="background: #2563eb;">📸 Kamerayı Aç</div>
+            <input type="file" class="btn-file-input" accept="image/*" capture="environment" onchange="processReceipt(event)">
+          </div>
+
+          <div class="btn-file-wrapper">
+            <div class="btn-file-view" style="background: #0284c7;">📁 Galeriden Yükle</div>
+            <input type="file" class="btn-file-input" accept="image/*" onchange="processReceipt(event)">
+          </div>
+        </div>
+
+        <div id="ocrStatus" style="display: none; font-size: 0.85rem; color: var(--primary); margin-top: 10px; font-weight: 600;">
+          Fiş taranıyor, lütfen bekleyin...
+        </div>
       </div>
 
       <form id="installmentForm" onsubmit="saveInstallment(event)">
@@ -221,10 +262,67 @@
 
 <script>
   let isAdmin = localStorage.getItem('isAdmin') === 'true';
-  const ADMIN_PASS = "20041980"; // Yönetici Şifresi
+  const ADMIN_PASS = "1980 2004"; // Yönetici Şifresi
 
   document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
 
+  // 1. Canlı Saat ve Tarih Motoru
+  function startLiveClock() {
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('liveClock').innerText = `${hours}:${minutes}:${seconds}`;
+
+      const options = { day: 'numeric', month: 'long', weekday: 'short' };
+      document.getElementById('liveDate').innerText = now.toLocaleDateString('tr-TR', options);
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+  }
+
+  // 2. Kalan Gün Hesaplayıcı
+  function calculateRemainingDays(targetDay) {
+    const today = new Date();
+    const currentDay = today.getDate();
+    let targetDate = new Date(today.getFullYear(), today.getMonth(), targetDay);
+
+    if (currentDay > targetDay) {
+      targetDate = new Date(today.getFullYear(), today.getMonth() + 1, targetDay);
+    }
+
+    const diffTime = targetDate - new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+
+  function updateCountdowns() {
+    const days4 = calculateRemainingDays(4);
+    const days14 = calculateRemainingDays(14);
+
+    const el4 = document.getElementById('daysUntil4');
+    const el14 = document.getElementById('daysUntil14');
+    const badge4 = document.getElementById('badgeDay4');
+    const badge14 = document.getElementById('badgeDay14');
+
+    if (days4 === 0) {
+      el4.innerHTML = `<span style="color: #22c55e;">Bugün! 🔔</span>`;
+      badge4.innerText = "Ödeme Günü";
+    } else {
+      el4.innerText = `${days4} Gün Kaldı`;
+      badge4.innerText = "Sıradaki Ödeme";
+    }
+
+    if (days14 === 0) {
+      el14.innerHTML = `<span style="color: #22c55e;">Bugün! 🔔</span>`;
+      badge14.innerText = "Ödeme Günü";
+    } else {
+      el14.innerText = `${days14} Gün Kaldı`;
+      badge14.innerText = "Sıradaki Ödeme";
+    }
+  }
+
+  // 3. Yönetici Modu
   function updateAdminUI() {
     const adminPanel = document.getElementById('adminPanelSection');
     const adminToggleBtn = document.getElementById('adminToggleBtn');
@@ -261,7 +359,7 @@
     }
   }
 
-  // Bitiş Tarihi Hesaplama Fonksiyonu
+  // 4. Bitiş Tarihi Hesaplama
   function calculateEndDate(startDateStr, totalMonths, paidMonths) {
     if (!startDateStr) return "Belirtilmedi";
     const d = new Date(startDateStr);
@@ -272,7 +370,7 @@
     return `${months[d.getMonth()]} ${d.getFullYear()}`;
   }
 
-  // Rehberden Seçim
+  // 5. Rehberden Seçim
   async function pickContact() {
     try {
       const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false });
@@ -285,11 +383,11 @@
         }
       }
     } catch (err) {
-      console.log('Rehber desteği yok veya iptal.');
+      console.log('Rehber seçimi iptal edildi veya desteklenmiyor.');
     }
   }
 
-  // WhatsApp Bildirimi
+  // 6. WhatsApp Bildirimi
   function sendWhatsApp(phone, person, title, monthly, remaining, day, endDate) {
     if (!phone) {
       alert('Kayıtlı telefon numarası bulunamadı!');
@@ -303,7 +401,7 @@
     window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank');
   }
 
-  // Taksitleri Listeleme
+  // 7. Taksitleri Listeleme
   async function loadInstallments() {
     try {
       const res = await fetch('/api/installments');
@@ -385,7 +483,7 @@
     }
   }
 
-  // Ödeme Alındı (+1 Taksit)
+  // 8. Ödeme Alındı (+1 Taksit)
   async function markPaid(id, nextPaid, maxCount) {
     if (nextPaid > maxCount) {
       alert('Tüm taksitler zaten ödenmiş!');
@@ -411,7 +509,7 @@
     }
   }
 
-  // Taksit Kaydetme
+  // 9. Yeni Taksit Kaydet
   async function saveInstallment(e) {
     e.preventDefault();
     const btn = document.getElementById('btnSubmit');
@@ -451,7 +549,7 @@
     }
   }
 
-  // Taksit Silme
+  // 10. Taksit Sil
   async function deleteInstallment(id) {
     if (!confirm('Bu kaydı tamamen silmek istediğinize emin misiniz?')) return;
     try {
@@ -462,39 +560,47 @@
     }
   }
 
-  // Fiş Tarama (OCR)
+  // 11. Mobilde Kesin Çalışan OCR Motoru
   async function processReceipt(event) {
-    const file = event.target.files[0];
+    const file = event.target.files && event.target.files[0];
     if (!file) return;
 
     const ocrStatus = document.getElementById('ocrStatus');
     ocrStatus.style.display = 'block';
+    ocrStatus.innerText = 'Fotoğraf alınıyor, taranıyor...';
 
     try {
-      const { data: { text } } = await Tesseract.recognize(file, 'tur', {
-        logger: m => {
-          if (m.status === 'recognizing text') ocrStatus.innerText = `Fiş taranıyor: %${Math.round(m.progress * 100)}`;
-        }
-      });
+      const worker = await Tesseract.createWorker('tur');
+      const ret = await worker.recognize(file);
+      const text = ret.data.text;
+      await worker.terminate();
 
-      ocrStatus.innerText = 'Tutar ayıklanıyor...';
-      const matches = text.match(/\d+[\.,]\d{2}/g);
+      ocrStatus.innerText = 'Tutar tespit ediliyor...';
+
+      const matches = text.match(/\d+([.,]\d{2})/g);
       if (matches && matches.length > 0) {
-        const lastNumber = matches[matches.length - 1].replace(',', '.');
+        const lastNumber = matches[matches.length - 1].replace(/\./g, '').replace(',', '.');
         document.getElementById('totalAmount').value = parseFloat(lastNumber);
       }
       
-      const cleanTitle = text.replace(/[^a-zA-Z0-9çğıöşüÇĞİÖŞÜ ]/g, ' ').trim().slice(0, 22);
-      if (cleanTitle) document.getElementById('title').value = cleanTitle;
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 3);
+      if (lines.length > 0) {
+        document.getElementById('title').value = lines[0].slice(0, 22);
+      }
 
       ocrStatus.style.display = 'none';
       alert('Fiş başarıyla okundu!');
     } catch (err) {
+      console.error(err);
       ocrStatus.style.display = 'none';
       alert('Fiş okunamadı, bilgileri el ile girebilirsin.');
+    } finally {
+      event.target.value = '';
     }
   }
 
+  startLiveClock();
+  updateCountdowns();
   updateAdminUI();
 </script>
 </body>
