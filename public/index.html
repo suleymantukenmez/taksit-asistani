@@ -3,1230 +3,291 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arkadaş Taksit & Tahsilat Asistanı</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#f0fdf4',
-              100: '#dcfce7',
-              500: '#22c55e',
-              600: '#16a34a',
-              700: '#15803d',
-            }
-          }
-        }
-      }
-    }
-  </script>
+  <title>Taksit & Tahsilat Asistanı</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --whatsapp: #25d366;
     }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.04);
-      border-radius: 999px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(100, 116, 139, 0.3);
-      border-radius: 999px;
-    }
-    .glass-card {
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(226, 232, 240, 0.8);
-    }
-    .dark .glass-card {
-      background: rgba(30, 41, 59, 0.88);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(51, 65, 85, 0.8);
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 16px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 650px; }
+    header { text-align: center; margin-bottom: 24px; }
+    h1 { font-size: 1.5rem; color: var(--primary); }
+    .status-badge { display: inline-block; font-size: 0.75rem; padding: 4px 8px; border-radius: 9999px; background: rgba(34, 197, 94, 0.2); color: var(--success); margin-top: 6px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; }
+    input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #0b1329; color: var(--text); font-size: 0.95rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .input-btn-group { display: flex; gap: 6px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.95rem; }
+    .btn-primary { background: var(--primary); color: #000; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-ocr { background: #3b82f6; color: #fff; margin-bottom: 12px; }
+    .btn-contact { background: #6366f1; color: #fff; width: auto; padding: 0 12px; font-size: 0.85rem; white-space: nowrap; }
+    .btn-whatsapp { background: var(--whatsapp); color: #000; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 4px; border: none; cursor: pointer; }
+    .file-label-btn { cursor: pointer; text-align: center; }
+    .ocr-loading { display: none; text-align: center; font-size: 0.85rem; color: var(--primary); margin-bottom: 12px; }
+    .item-card { background: #131d33; border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .item-title { font-weight: 600; font-size: 1rem; }
+    .item-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+    .item-badge { background: #0284c7; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-right: 6px; }
+    .actions { display: flex; align-items: center; gap: 6px; }
+    .btn-delete { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
   </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen pb-16 transition-colors duration-200">
-
-  <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
-          <i data-lucide="receipt" class="w-5 h-5"></i>
-        </div>
-        <div>
-          <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-tight">Arkadaş Taksit Asistanı</h1>
-          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
-            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Tahsilat Günleri: Her Ayın 4'ü ve 14'ü
-            <span id="cloudSyncStatus" class="inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 text-[10px]">
-              <i data-lucide="server" class="w-3 h-3"></i> Sunucu Bağlanıyor...
-            </span>
-          </p>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <button onclick="toggleDarkMode()" id="themeToggleBtn" title="Gece / Gündüz Modu" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition">
-          <i data-lucide="moon" id="themeIcon" class="w-4 h-4"></i>
-        </button>
-
-        <button onclick="openAiModal()" class="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold shadow-md shadow-indigo-500/25 transition">
-          <i data-lucide="sparkles" class="w-4 h-4"></i>
-          <span>AI ile Fiş Oku</span>
-        </button>
-        <button onclick="openManualModal()" class="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">
-          <i data-lucide="plus" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Yeni Taksit</span>
-        </button>
-      </div>
-    </div>
+<body>
+<div class="container">
+  <header>
+    <h1>Taksit & Tahsilat Asistanı</h1>
+    <div id="status" class="status-badge">Veritabanı Aktif</div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-6 space-y-6">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="glass-card p-5 rounded-2xl shadow-sm relative overflow-hidden">
-        <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-100 dark:bg-emerald-950/40 rounded-full opacity-50 blur-xl"></div>
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Toplam Kalan Alacak</span>
-          <span class="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400">
-            <i data-lucide="wallet" class="w-4 h-4"></i>
-          </span>
-        </div>
-        <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight" id="statTotalRemaining">₺0</div>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
-          <span id="statActiveCount" class="font-bold text-slate-700 dark:text-slate-200">0</span> aktif taksitli ürün
-        </p>
-      </div>
+  <div class="card">
+    <input type="file" id="receiptFileInput" accept="image/*" style="display: none;" onchange="processReceipt(event)">
+    <label for="receiptFileInput" class="btn btn-ocr file-label-btn">
+      📷 Fiş / Makbuz Tara (Kamera / Galeri)
+    </label>
+    <div id="ocrStatus" class="ocr-loading">Fiş taranıyor, metinler okunuyor...</div>
 
-      <div class="glass-card p-5 rounded-2xl shadow-sm relative overflow-hidden">
-        <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-100 dark:bg-blue-950/40 rounded-full opacity-50 blur-xl"></div>
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-wider flex items-center gap-1">
-            <span class="w-2 h-2 rounded-full bg-blue-600"></span> Ayın 4'ü Beklenen
-          </span>
-          <span class="p-2 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 font-bold text-xs">4. GÜN</span>
-        </div>
-        <div class="text-2xl sm:text-3xl font-extrabold text-blue-900 dark:text-blue-200 tracking-tight" id="statDue4th">₺0</div>
-        <p class="text-xs text-blue-600/80 dark:text-blue-300/80 mt-1 font-medium" id="statDue4thCount">0 arkadaşının ödemesi var</p>
-      </div>
-
-      <div class="glass-card p-5 rounded-2xl shadow-sm relative overflow-hidden">
-        <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-amber-100 dark:bg-amber-950/40 rounded-full opacity-50 blur-xl"></div>
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1">
-            <span class="w-2 h-2 rounded-full bg-amber-500"></span> Ayın 14'ü Beklenen
-          </span>
-          <span class="p-2 rounded-xl bg-amber-50 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 font-bold text-xs">14. GÜN</span>
-        </div>
-        <div class="text-2xl sm:text-3xl font-extrabold text-amber-900 dark:text-amber-200 tracking-tight" id="statDue14th">₺0</div>
-        <p class="text-xs text-amber-600/80 dark:text-amber-300/80 mt-1 font-medium" id="statDue14thCount">0 arkadaşının ödemesi var</p>
-      </div>
-
-      <div class="glass-card p-5 rounded-2xl shadow-sm relative overflow-hidden">
-        <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-purple-100 dark:bg-purple-950/40 rounded-full opacity-50 blur-xl"></div>
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-semibold text-purple-700 dark:text-purple-400 uppercase tracking-wider">Tahsil Edilen Tutar</span>
-          <span class="p-2 rounded-xl bg-purple-50 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400">
-            <i data-lucide="check-check" class="w-4 h-4"></i>
-          </span>
-        </div>
-        <div class="text-2xl sm:text-3xl font-extrabold text-purple-900 dark:text-purple-200 tracking-tight" id="statCollectedMonth">₺0</div>
-        <p class="text-xs text-purple-600/80 dark:text-purple-300/80 mt-1" id="statCollectedPercentage">%0 başarıyla toplandı</p>
-      </div>
-    </div>
-
-    <div class="glass-card p-4 rounded-2xl shadow-sm space-y-4">
-      <div>
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-            <i data-lucide="users" class="w-3.5 h-3.5"></i> Arkadaşlarına Göre Filtrele
-          </span>
-          <span class="text-xs text-slate-400 dark:text-slate-500 font-medium">Arkadaşına tıklayarak sadece onun borçlarını gör</span>
-        </div>
-        <div class="flex items-center gap-2 overflow-x-auto pb-1 custom-scrollbar" id="personBadgesContainer"></div>
-      </div>
-
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
-        <div class="inline-flex p-1 bg-slate-200/70 dark:bg-slate-800 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300">
-          <button onclick="switchTab('all')" id="tabBtn-all" class="px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition">Tümü</button>
-          <button onclick="switchTab('day4')" id="tabBtn-day4" class="px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-1">
-            <span class="w-2 h-2 rounded-full bg-blue-500"></span> 4'ü Günü Gelenler
-          </button>
-          <button onclick="switchTab('day14')" id="tabBtn-day14" class="px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-1">
-            <span class="w-2 h-2 rounded-full bg-amber-500"></span> 14'ü Günü Gelenler
-          </button>
-          <button onclick="switchTab('summary')" id="tabBtn-summary" class="px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition">Kişi Özeti</button>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <div class="relative w-full md:w-64">
-            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-            <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Ürün, arkadaş veya telefon ara..." class="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
-          </div>
-          <button onclick="exportDataJson()" title="Yedek Al (JSON İndir)" class="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs transition flex items-center gap-1">
-            <i data-lucide="download" class="w-4 h-4"></i>
-          </button>
-          <button onclick="document.getElementById('jsonFileInput').click()" title="Yedeği Geri Yükle" class="p-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs transition flex items-center gap-1">
-            <i data-lucide="upload" class="w-4 h-4"></i>
-          </button>
-          <input type="file" id="jsonFileInput" accept=".json" class="hidden" onchange="importDataJson(event)">
-        </div>
-      </div>
-    </div>
-
-    <div id="listViewContainer" class="space-y-3">
-      <div id="cardsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-      <div id="emptyState" class="hidden text-center py-14 px-4 bg-white dark:bg-slate-800/60 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
-        <div class="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto text-slate-400 mb-3">
-          <i data-lucide="inbox" class="w-6 h-6"></i>
-        </div>
-        <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200">Kayıtlı taksit bulunmuyor</h3>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
-          "Yeni Taksit" veya "AI ile Fiş Oku" ile eklediğinde sunucu veritabanına kaydedilir ve sayfa yenilense bile silinmez.
-        </p>
-        <div class="mt-4 flex items-center justify-center gap-2">
-          <button onclick="openManualModal()" class="px-3 py-1.5 bg-slate-900 dark:bg-emerald-600 text-white rounded-xl text-xs font-semibold hover:opacity-90 transition">
-            + İlk Taksiti Ekle
-          </button>
-          <button onclick="loadSampleData()" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-600 transition">
-            Örnek Kayıtları Yükle
+    <form id="installmentForm" onsubmit="saveInstallment(event)">
+      <div class="form-group">
+        <label>Kişi / Borçlu Adı</label>
+        <div class="input-btn-group">
+          <input type="text" id="person" required placeholder="Örn: Ahmet Yılmaz">
+          <button type="button" id="btnPickContact" class="btn btn-contact" onclick="pickContact()" title="Rehberden Seç">
+            📇 Rehberden Al
           </button>
         </div>
       </div>
-    </div>
+      
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Telefon</label>
+          <input type="tel" id="phone" placeholder="05xx xxx xx xx">
+        </div>
+        <div class="form-group">
+          <label>Platform / Yer</label>
+          <select id="platform">
+            <option value="Trendyol">Trendyol</option>
+            <option value="Hepsiburada">Hepsiburada</option>
+            <option value="Elden">Elden Satış</option>
+            <option value="Diğer">Diğer</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Açıklama / Ürün Başlığı</label>
+        <input type="text" id="title" required placeholder="Örn: Telefon / Mobilya">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Toplam Tutar (TL)</label>
+          <input type="number" id="totalAmount" required step="0.01" placeholder="0.00">
+        </div>
+        <div class="form-group">
+          <label>Taksit Sayısı</label>
+          <input type="number" id="totalInstallments" required value="3" min="1">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Ödeme Günü (Ayın)</label>
+          <input type="number" id="paymentDay" required min="1" max="31" value="1">
+        </div>
+        <div class="form-group">
+          <label>Başlangıç Tarihi</label>
+          <input type="date" id="startDate" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Taksiti Kaydet</button>
+    </form>
+  </div>
 
-    <div id="summaryViewContainer" class="hidden">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="personSummaryCards"></div>
-    </div>
-  </main>
+  <h2>Kayıtlı Taksitler</h2>
+  <div id="listContainer" style="margin-top: 12px;"></div>
+</div>
 
-  <!-- AI Analiz Modalı -->
-  <div id="aiModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800 flex flex-col max-h-[90vh]">
-      <div class="px-6 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          <div class="p-2 rounded-xl bg-white/20">
-            <i data-lucide="sparkles" class="w-5 h-5 text-amber-200"></i>
-          </div>
+<script>
+  document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+
+  // Rehber desteği kontrolü (Desteklenmeyen tarayıcılarda butonu gizler)
+  if (!('contacts' in navigator && 'ContactsManager' in window)) {
+    const contactBtn = document.getElementById('btnPickContact');
+    if (contactBtn) contactBtn.style.display = 'none';
+  }
+
+  // 1. Telefondan Rehberi Açıp Kişi ve Numara Çekme
+  async function pickContact() {
+    try {
+      const props = ['name', 'tel'];
+      const contacts = await navigator.contacts.select(props, { multiple: false });
+      
+      if (contacts && contacts.length > 0) {
+        const contact = contacts[0];
+        if (contact.name && contact.name.length > 0) {
+          document.getElementById('person').value = contact.name[0];
+        }
+        if (contact.tel && contact.tel.length > 0) {
+          let cleanPhone = contact.tel[0].replace(/\s+/g, '').replace(/-/g, '');
+          document.getElementById('phone').value = cleanPhone;
+        }
+      }
+    } catch (err) {
+      console.log('Rehber seçimi iptal edildi veya desteklenmiyor:', err);
+    }
+  }
+
+  // 2. WhatsApp Mesajını Uygulama Olarak Açma
+  function sendToWhatsApp(phone, person, title, amount, day) {
+    if (!phone) {
+      alert('Kayıtlı bir telefon numarası bulunamadı!');
+      return;
+    }
+
+    // Numarayı uluslararası formata uyarla (Başında 0 varsa 90 ekle)
+    let clean = phone.replace(/[^0-9]/g, '');
+    if (clean.startsWith('0')) clean = '90' + clean.substring(1);
+    if (!clean.startsWith('90')) clean = '90' + clean;
+
+    const message = `Merhaba ${person}, ${title} alışverişine ait taksit ödemen yaklaşıyor.\nTutar: ${amount} TL\nÖdeme Günü: Ayın ${day}. günü.\nBilginize sunarız.`;
+    const encoded = encodeURIComponent(message);
+
+    // Sayfayı bozmadan doğrudan WhatsApp uygulamasını tetikleyen güvenli link
+    const waUrl = `https://api.whatsapp.com/send?phone=${clean}&text=${encoded}`;
+    window.open(waUrl, '_blank');
+  }
+
+  // 3. Taksitleri Listele
+  async function loadInstallments() {
+    try {
+      const res = await fetch('/api/installments');
+      const data = await res.json();
+      const container = document.getElementById('listContainer');
+      container.innerHTML = '';
+
+      if (!data || data.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted); text-align: center; margin-top: 20px;">Henüz taksit kaydı yok.</p>';
+        return;
+      }
+
+      data.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'item-card';
+        const total = item.totalamount || item.totalAmount || 0;
+        const paid = item.paidinstallments || item.paidInstallments || 0;
+        const count = item.totalinstallments || item.totalInstallments || 1;
+        const day = item.paymentday || item.paymentDay || 1;
+
+        div.innerHTML = `
           <div>
-            <h3 class="font-bold text-sm sm:text-base">AI Sipariş & Fiş Analizi</h3>
-            <p class="text-[11px] text-violet-100">Trendyol, Hepsiburada siparişi veya taksit ekran görüntüsü</p>
+            <div class="item-title"><span class="item-badge">${item.platform || 'Genel'}</span>${item.person} - ${item.title}</div>
+            <div class="item-sub">Tutar: ${total} TL | Taksit: ${paid}/${count} | Gün: Ayın ${day}'i</div>
+            ${item.phone ? `<div class="item-sub" style="color: #38bdf8;">📞 ${item.phone}</div>` : ''}
           </div>
-        </div>
-        <button onclick="closeAiModal()" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <div class="p-6 overflow-y-auto space-y-4 text-xs sm:text-sm custom-scrollbar text-slate-800 dark:text-slate-200">
-        <div id="dropZone" onclick="document.getElementById('aiFileInput').click()" class="border-2 border-dashed border-violet-200 dark:border-violet-800/60 hover:border-violet-400 bg-violet-50/50 dark:bg-slate-800/50 p-6 rounded-2xl text-center cursor-pointer transition">
-          <input type="file" id="aiFileInput" accept="image/*" class="hidden" onchange="handleImageSelection(event)">
-          <div id="dropZonePlaceholder" class="space-y-2">
-            <div class="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl shadow-sm text-violet-600 flex items-center justify-center mx-auto">
-              <i data-lucide="upload-cloud" class="w-6 h-6"></i>
-            </div>
-            <p class="font-semibold text-slate-700 dark:text-slate-200">Fotoğraf yüklemek için tıkla veya sürükle</p>
-            <p class="text-[11px] text-slate-400">Trendyol veya Hepsiburada sipariş detayı, taksit tablosu</p>
-          </div>
-          <div id="previewContainer" class="hidden relative">
-            <img id="imagePreview" src="" alt="Önizleme" class="max-h-48 mx-auto rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 object-contain">
-            <button onclick="event.stopPropagation(); removeSelectedImage()" class="absolute -top-2 -right-2 bg-rose-600 text-white p-1.5 rounded-full shadow-md hover:bg-rose-700">
-              <i data-lucide="x" class="w-3.5 h-3.5"></i>
+          <div class="actions">
+            <button class="btn-whatsapp" onclick="sendToWhatsApp('${item.phone || ''}', '${item.person}', '${item.title}', '${total}', '${day}')">
+              💬 WP
             </button>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Kimin İçin Alındı?</label>
-            <input type="text" id="aiPersonHint" placeholder="Örn: Ahmet, Burak, Ayşe..." class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-violet-500">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Telefon Numarası</label>
-            <input type="tel" id="aiPhoneHint" placeholder="05xx xxx xx xx" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:border-violet-500">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Ödeme Günü</label>
-          <div class="grid grid-cols-2 gap-2">
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-200">
-              <input type="radio" name="aiPayDay" value="4" checked class="text-blue-600">
-              <span>Her Ayın 4'ü</span>
-            </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-200">
-              <input type="radio" name="aiPayDay" value="14" class="text-amber-600">
-              <span>Her Ayın 14'ü</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="pt-2 border-t border-slate-100 dark:border-slate-800">
-          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Veya metinle tarif et (AI otomatik çıkarsın):</label>
-          <textarea id="aiTextPrompt" rows="2" placeholder="Örn: Trendyol'dan Caner'e 4200 TL'ye 6 taksit ayakkabı aldım, ayın 14'ünde ödeyecek." class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-violet-500"></textarea>
-        </div>
-
-        <div id="aiStatus" class="hidden p-3 rounded-xl bg-violet-50 dark:bg-violet-950/40 border border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-300 flex items-center gap-2.5">
-          <div class="animate-spin rounded-full h-4 w-4 border-2 border-violet-600 border-t-transparent"></div>
-          <span class="text-xs font-medium" id="aiStatusText">Görsel inceleniyor ve taksit bilgileri çıkarılıyor...</span>
-        </div>
-      </div>
-
-      <div class="px-6 py-3.5 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
-        <button onclick="closeAiModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-800 transition">İptal</button>
-        <button onclick="processAiExtraction()" id="aiSubmitBtn" class="flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold shadow-md transition disabled:opacity-50">
-          <i data-lucide="cpu" class="w-4 h-4"></i>
-          <span>Yapay Zekayla Analiz Et ve Ekle</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Elle Ekleme Modalı -->
-  <div id="manualModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800 flex flex-col max-h-[90vh]">
-      <div class="px-6 py-4 bg-slate-900 dark:bg-slate-800 text-white flex items-center justify-between">
-        <h3 class="font-bold text-sm sm:text-base flex items-center gap-2">
-          <i data-lucide="plus-circle" class="w-4 h-4 text-emerald-400"></i> Yeni Taksitli Alışveriş Ekle
-        </h3>
-        <button onclick="closeManualModal()" class="text-white/80 hover:text-white">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <form id="manualForm" onsubmit="handleManualSubmit(event)" class="p-6 overflow-y-auto space-y-3.5 text-xs sm:text-sm custom-scrollbar text-slate-800 dark:text-slate-200">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Arkadaş Adı</label>
-            <input type="text" id="mPerson" required placeholder="Örn: Emre, Burak, Ceren..." class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-slate-800 focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Telefon (WhatsApp)</label>
-            <input type="tel" id="mPhone" placeholder="0532xxxxxxx" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-slate-800 focus:outline-none">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Ürün / Alışveriş Adı</label>
-          <input type="text" id="mTitle" required placeholder="Örn: AirPods Pro, Kahve Makinesi, Mont..." class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-slate-800 focus:outline-none">
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Platform / Mağaza</label>
-            <select id="mPlatform" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-slate-800 focus:outline-none">
-              <option value="Trendyol">Trendyol</option>
-              <option value="Hepsiburada">Hepsiburada</option>
-              <option value="Amazon">Amazon</option>
-              <option value="N11">N11</option>
-              <option value="Diğer">Diğer Mağaza</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Toplam Tutar (TL)</label>
-            <input type="number" step="0.01" id="mTotalAmount" required placeholder="4500" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-slate-800 focus:outline-none">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Toplam Taksit</label>
-            <select id="mTotalInstallments" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-slate-800 focus:outline-none">
-              <option value="2">2 Taksit</option>
-              <option value="3" selected>3 Taksit</option>
-              <option value="4">4 Taksit</option>
-              <option value="6">6 Taksit</option>
-              <option value="9">9 Taksit</option>
-              <option value="12">12 Taksit</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Şu Ana Kadar Ödenen</label>
-            <input type="number" id="mPaidInstallments" value="0" min="0" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-slate-800 focus:outline-none">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">Sana Hangi Gün Ödeyecek?</label>
-          <div class="grid grid-cols-2 gap-2">
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 cursor-pointer font-semibold text-xs text-slate-700 dark:text-slate-200">
-              <input type="radio" name="mPaymentDay" value="4" checked class="text-blue-600">
-              <span>Her Ayın 4'ü</span>
-            </label>
-            <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 cursor-pointer font-semibold text-xs text-slate-700 dark:text-slate-200">
-              <input type="radio" name="mPaymentDay" value="14" class="text-amber-600">
-              <span>Her Ayın 14'ü</span>
-            </label>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">İlk Taksit / Başlangıç Ayı</label>
-          <input type="date" id="mStartDate" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-slate-800 focus:outline-none text-xs">
-        </div>
-
-        <div class="pt-3 flex justify-end gap-2 border-t border-slate-100 dark:border-slate-800">
-          <button type="button" onclick="closeManualModal()" class="px-4 py-2 font-medium text-slate-600 dark:text-slate-400">Vazgeç</button>
-          <button type="submit" class="bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white px-4 py-2 rounded-xl font-bold shadow-md transition">Kaydet</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
-    <div class="bg-slate-900 dark:bg-slate-800 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-700 text-xs sm:text-sm">
-      <i id="toastIcon" data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
-      <span id="toastMessage" class="font-medium">İşlem başarılı</span>
-    </div>
-  </div>
-
-  <script>
-    let isDarkMode = false;
-    function initTheme() {
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        isDarkMode = true;
-      }
-      applyTheme();
-    }
-
-    function toggleDarkMode() {
-      isDarkMode = !isDarkMode;
-      applyTheme();
-    }
-
-    function applyTheme() {
-      const html = document.documentElement;
-      const icon = document.getElementById('themeIcon');
-      if (isDarkMode) {
-        html.classList.add('dark');
-        if (icon) {
-          icon.setAttribute('data-lucide', 'sun');
-          icon.classList.remove('text-slate-600');
-          icon.classList.add('text-amber-400');
-        }
-      } else {
-        html.classList.remove('dark');
-        if (icon) {
-          icon.setAttribute('data-lucide', 'moon');
-          icon.classList.remove('text-amber-400');
-          icon.classList.add('text-slate-600');
-        }
-      }
-      lucide.createIcons();
-    }
-
-    const PERSON_COLORS = [
-      { bg: 'bg-emerald-100 dark:bg-emerald-950/70', text: 'text-emerald-800 dark:text-emerald-300', border: 'border-emerald-300 dark:border-emerald-800', dot: 'bg-emerald-500' },
-      { bg: 'bg-indigo-100 dark:bg-indigo-950/70', text: 'text-indigo-800 dark:text-indigo-300', border: 'border-indigo-300 dark:border-indigo-800', dot: 'bg-indigo-500' },
-      { bg: 'bg-amber-100 dark:bg-amber-950/70', text: 'text-amber-800 dark:text-amber-300', border: 'border-amber-300 dark:border-amber-800', dot: 'bg-amber-500' },
-      { bg: 'bg-rose-100 dark:bg-rose-950/70', text: 'text-rose-800 dark:text-rose-300', border: 'border-rose-300 dark:border-rose-800', dot: 'bg-rose-500' },
-      { bg: 'bg-cyan-100 dark:bg-cyan-950/70', text: 'text-cyan-800 dark:text-cyan-300', border: 'border-cyan-300 dark:border-cyan-800', dot: 'bg-cyan-500' },
-      { bg: 'bg-purple-100 dark:bg-purple-950/70', text: 'text-purple-800 dark:text-purple-300', border: 'border-purple-300 dark:border-purple-800', dot: 'bg-purple-500' },
-      { bg: 'bg-orange-100 dark:bg-orange-950/70', text: 'text-orange-800 dark:text-orange-300', border: 'border-orange-300 dark:border-orange-800', dot: 'bg-orange-500' },
-      { bg: 'bg-teal-100 dark:bg-teal-950/70', text: 'text-teal-800 dark:text-teal-300', border: 'border-teal-300 dark:border-teal-800', dot: 'bg-teal-500' },
-    ];
-
-    let installments = [];
-    window.installments = installments;
-    let selectedBase64Image = null;
-
-    async function loadDataFromServer() {
-      const syncBadge = document.getElementById('cloudSyncStatus');
-      try {
-        const res = await fetch('/api/installments');
-        if (res.ok) {
-          window.installments = await res.json();
-          if (syncBadge) {
-            syncBadge.innerHTML = `<i data-lucide="database" class="w-3 h-3 text-emerald-400"></i> Sunucu Aktif (${window.installments.length})`;
-            syncBadge.classList.remove('hidden');
-            lucide.createIcons();
-          }
-          updateDashboard();
-        }
-      } catch (err) {
-        console.error("Sunucudan veri çekme hatası:", err);
-        if (syncBadge) {
-          syncBadge.innerHTML = `<i data-lucide="alert-circle" class="w-3 h-3 text-rose-400"></i> Çevrimdışı`;
-          syncBadge.classList.remove('hidden');
-          lucide.createIcons();
-        }
-      }
-    }
-
-    async function saveToServer(item) {
-      try {
-        await fetch('/api/installments', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(item)
-        });
-      } catch (err) {
-        console.error("Sunucuya kaydetme hatası:", err);
-      }
-    }
-
-    async function deleteFromServer(id) {
-      try {
-        await fetch(`/api/installments/${id}`, {
-          method: 'DELETE'
-        });
-      } catch (err) {
-        console.error("Sunucudan silme hatası:", err);
-      }
-    }
-
-    function loadSampleData() {
-      const samples = [
-        {
-          id: 'inst-' + Date.now() + '-1',
-          person: 'Burak',
-          phone: '05321112233',
-          title: 'Xiaomi Robot Süpürge',
-          platform: 'Trendyol',
-          totalAmount: 11400,
-          totalInstallments: 6,
-          paidInstallments: 2,
-          paymentDay: 4,
-          startDate: '2026-08-04',
-          history: []
-        },
-        {
-          id: 'inst-' + Date.now() + '-2',
-          person: 'Ceren',
-          phone: '05432223344',
-          title: 'Karaca Tencere Seti',
-          platform: 'Hepsiburada',
-          totalAmount: 4800,
-          totalInstallments: 4,
-          paidInstallments: 1,
-          paymentDay: 14,
-          startDate: '2026-09-14',
-          history: []
-        }
-      ];
-
-      samples.forEach(s => {
-        window.installments.push(s);
-        saveToServer(s);
-      });
-      showToast("Örnek taksitler yüklendi ve sunucuya kaydedildi!");
-      updateDashboard();
-    }
-
-    let currentTab = 'all';
-    let selectedPersonFilter = null;
-    let searchQuery = '';
-
-    function formatCurrency(val) {
-      return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 }).format(val);
-    }
-
-    function getPersonColor(name) {
-      let hash = 0;
-      for (let i = 0; i < name.length; i++) {
-        hash = name.charCodeAt(i) + ((hash << 5) - hash);
-      }
-      const index = Math.abs(hash) % PERSON_COLORS.length;
-      return PERSON_COLORS[index];
-    }
-
-    function showToast(message, isError = false) {
-      const toast = document.getElementById('toastNotification');
-      const text = document.getElementById('toastMessage');
-      const icon = document.getElementById('toastIcon');
-      text.innerText = message;
-      if (isError) {
-        icon.className = 'w-5 h-5 text-rose-400';
-        icon.setAttribute('data-lucide', 'alert-circle');
-      } else {
-        icon.className = 'w-5 h-5 text-emerald-400';
-        icon.setAttribute('data-lucide', 'check-circle');
-      }
-      lucide.createIcons();
-      toast.classList.remove('translate-y-24', 'opacity-0', 'pointer-events-none');
-      setTimeout(() => {
-        toast.classList.add('translate-y-24', 'opacity-0', 'pointer-events-none');
-      }, 3500);
-    }
-
-    function updateDashboard() {
-      let totalRemaining = 0;
-      let activeCount = 0;
-      let due4th = 0;
-      let count4th = new Set();
-      let due14th = 0;
-      let count14th = new Set();
-      let totalPaidAll = 0;
-
-      window.installments.forEach(item => {
-        const monthlyAmount = item.totalAmount / item.totalInstallments;
-        const remainingInstallments = item.totalInstallments - item.paidInstallments;
-        const remainingAmount = monthlyAmount * remainingInstallments;
-
-        if (remainingInstallments > 0) {
-          activeCount++;
-          totalRemaining += remainingAmount;
-
-          if (item.paymentDay === 4) {
-            due4th += monthlyAmount;
-            count4th.add(item.person);
-          } else if (item.paymentDay === 14) {
-            due14th += monthlyAmount;
-            count14th.add(item.person);
-          }
-        }
-
-        totalPaidAll += (monthlyAmount * item.paidInstallments);
-      });
-
-      document.getElementById('statTotalRemaining').innerText = formatCurrency(totalRemaining);
-      document.getElementById('statActiveCount').innerText = activeCount;
-
-      document.getElementById('statDue4th').innerText = formatCurrency(due4th);
-      document.getElementById('statDue4thCount').innerText = `${count4th.size} arkadaşının taksiti var`;
-
-      document.getElementById('statDue14th').innerText = formatCurrency(due14th);
-      document.getElementById('statDue14thCount').innerText = `${count14th.size} arkadaşının taksiti var`;
-
-      document.getElementById('statCollectedMonth').innerText = formatCurrency(totalPaidAll);
-      const totalAllTime = totalRemaining + totalPaidAll;
-      const pct = totalAllTime > 0 ? Math.round((totalPaidAll / totalAllTime) * 100) : 0;
-      document.getElementById('statCollectedPercentage').innerText = `%${pct} toplam tahsil edildi`;
-
-      renderPersonBadges();
-      renderContent();
-    }
-
-    function renderPersonBadges() {
-      const container = document.getElementById('personBadgesContainer');
-      const uniquePersons = [...new Set(window.installments.map(i => i.person))];
-
-      let html = `
-        <button onclick="setPersonFilter(null)" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap ${selectedPersonFilter === null ? 'bg-slate-900 text-white dark:bg-emerald-600 shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}">
-          <span>Hepsi</span>
-          <span class="text-[10px] py-0.5 px-1.5 rounded-full ${selectedPersonFilter === null ? 'bg-slate-700 dark:bg-emerald-800 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}">${window.installments.length}</span>
-        </button>
-      `;
-
-      uniquePersons.forEach(person => {
-        const color = getPersonColor(person);
-        const count = window.installments.filter(i => i.person === person && (i.totalInstallments - i.paidInstallments > 0)).length;
-        const isSelected = selectedPersonFilter === person;
-
-        html += `
-          <button onclick="setPersonFilter('${person}')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap border ${color.border} ${color.bg} ${color.text} ${isSelected ? 'ring-2 ring-slate-800 dark:ring-white shadow-sm' : 'hover:opacity-90'}">
-            <span class="w-2 h-2 rounded-full ${color.dot}"></span>
-            <span>${person}</span>
-            <span class="text-[10px] bg-white/70 dark:bg-black/30 px-1.5 py-0.2 rounded-full">${count} aktif</span>
-          </button>
-        `;
-      });
-
-      container.innerHTML = html;
-    }
-
-    function setPersonFilter(person) {
-      selectedPersonFilter = person;
-      renderPersonBadges();
-      renderContent();
-    }
-
-    function handleSearch(val) {
-      searchQuery = val.toLowerCase().trim();
-      renderContent();
-    }
-
-    function switchTab(tab) {
-      currentTab = tab;
-      ['all', 'day4', 'day14', 'summary'].forEach(t => {
-        const btn = document.getElementById(`tabBtn-${t}`);
-        if (t === tab) {
-          btn.className = 'px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm transition font-bold';
-        } else {
-          btn.className = 'px-3.5 py-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition';
-        }
-      });
-
-      const listView = document.getElementById('listViewContainer');
-      const summaryView = document.getElementById('summaryViewContainer');
-
-      if (tab === 'summary') {
-        listView.classList.add('hidden');
-        summaryView.classList.remove('hidden');
-        renderSummaryView();
-      } else {
-        listView.classList.remove('hidden');
-        summaryView.classList.add('hidden');
-        renderCardsView();
-      }
-    }
-
-    function renderContent() {
-      if (currentTab === 'summary') {
-        renderSummaryView();
-      } else {
-        renderCardsView();
-      }
-    }
-
-    function renderCardsView() {
-      const container = document.getElementById('cardsList');
-      const emptyState = document.getElementById('emptyState');
-
-      let filtered = window.installments.filter(item => {
-        if (selectedPersonFilter && item.person !== selectedPersonFilter) return false;
-        if (currentTab === 'day4' && item.paymentDay !== 4) return false;
-        if (currentTab === 'day14' && item.paymentDay !== 14) return false;
-
-        if (searchQuery) {
-          const matchTitle = item.title.toLowerCase().includes(searchQuery);
-          const matchPerson = item.person.toLowerCase().includes(searchQuery);
-          const matchPlatform = item.platform.toLowerCase().includes(searchQuery);
-          const matchPhone = (item.phone || '').includes(searchQuery);
-          if (!matchTitle && !matchPerson && !matchPlatform && !matchPhone) return false;
-        }
-        return true;
-      });
-
-      if (filtered.length === 0) {
-        container.innerHTML = '';
-        emptyState.classList.remove('hidden');
-        return;
-      } else {
-        emptyState.classList.add('hidden');
-      }
-
-      let html = '';
-      filtered.forEach(item => {
-        const monthly = item.totalAmount / item.totalInstallments;
-        const remaining = item.totalInstallments - item.paidInstallments;
-        const isCompleted = remaining === 0;
-        const color = getPersonColor(item.person);
-
-        let platformBadge = 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
-        if (item.platform.toLowerCase().includes('trendyol')) platformBadge = 'bg-orange-50 dark:bg-orange-950/50 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800';
-        if (item.platform.toLowerCase().includes('hepsiburada')) platformBadge = 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800';
-
-        const dayBadge = item.paymentDay === 4 
-          ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300"><i data-lucide="calendar" class="w-3 h-3"></i> Ayın 4'ü</span>`
-          : `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300"><i data-lucide="calendar" class="w-3 h-3"></i> Ayın 14'ü</span>`;
-
-        const progressPct = Math.round((item.paidInstallments / item.totalInstallments) * 100);
-
-        html += `
-          <div class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between border ${isCompleted ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/20' : 'border-slate-200 dark:border-slate-800'}">
-            <div>
-              <div class="flex items-center justify-between gap-2 mb-3">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${color.border} ${color.bg} ${color.text}">
-                  <span class="w-2 h-2 rounded-full ${color.dot}"></span>
-                  ${item.person}
-                </span>
-                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md ${platformBadge}">
-                  ${item.platform}
-                </span>
-              </div>
-
-              <h3 class="font-bold text-sm sm:text-base text-slate-800 dark:text-slate-100 line-clamp-1 mb-1">${item.title}</h3>
-
-              ${item.phone ? `
-                <div class="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mb-2">
-                  <i data-lucide="phone" class="w-3 h-3"></i>
-                  <span>${item.phone}</span>
-                </div>
-              ` : ''}
-
-              <div class="mt-3 p-3 rounded-xl bg-slate-50/90 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700 flex items-center justify-between">
-                <div>
-                  <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Aylık Taksit</div>
-                  <div class="text-base font-extrabold text-slate-900 dark:text-white">${formatCurrency(monthly)}</div>
-                </div>
-                <div class="text-right">
-                  <div class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Toplam Tutar</div>
-                  <div class="text-sm font-bold text-slate-700 dark:text-slate-300">${formatCurrency(item.totalAmount)}</div>
-                </div>
-              </div>
-
-              <div class="mt-3 space-y-1.5">
-                <div class="flex items-center justify-between text-xs font-semibold">
-                  <span class="text-slate-500 dark:text-slate-400">${item.paidInstallments} / ${item.totalInstallments} Taksit Ödendi</span>
-                  <span class="${isCompleted ? 'text-emerald-600 font-bold' : 'text-slate-700 dark:text-slate-300'}">${isCompleted ? 'Tamamlandı 🎉' : `${remaining} Kalan`}</span>
-                </div>
-                <div class="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                  <div class="h-full rounded-full transition-all duration-500 ${isCompleted ? 'bg-emerald-500' : 'bg-slate-800 dark:bg-emerald-500'}" style="width: ${progressPct}%"></div>
-                </div>
-              </div>
-
-              <div class="mt-3 flex items-center justify-between">
-                ${dayBadge}
-                <span class="text-[11px] text-slate-400 font-medium">Kalan: <strong class="text-slate-700 dark:text-slate-200 font-semibold">${formatCurrency(monthly * remaining)}</strong></span>
-              </div>
-            </div>
-
-            <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
-              <button onclick="sendWhatsAppReminder('${item.id}')" title="WhatsApp Hatırlatması Gönder" class="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 rounded-xl text-xs font-semibold transition">
-                <i data-lucide="message-circle" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
-                <span>Hatırlat</span>
-              </button>
-
-              <div class="flex items-center gap-1.5">
-                ${!isCompleted ? `
-                  <button onclick="markInstallmentPaid('${item.id}')" class="flex items-center gap-1 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-xl text-xs font-bold transition shadow-sm">
-                    <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>
-                    <span>Taksit Aldım</span>
-                  </button>
-                ` : `
-                  <span class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-xs font-bold rounded-lg flex items-center gap-1">
-                    <i data-lucide="check-check" class="w-3 h-3"></i> Bitti
-                  </span>
-                `}
-                <button onclick="deleteInstallment('${item.id}')" title="Sil" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/50 transition">
-                  <i data-lucide="trash-2" class="w-4 h-4"></i>
-                </button>
-              </div>
-            </div>
+            <button class="btn-delete" onclick="deleteInstallment('${item.id}')">Sil</button>
           </div>
         `;
+        container.appendChild(div);
       });
-
-      container.innerHTML = html;
-      lucide.createIcons();
+    } catch (err) {
+      console.error('Listeleme hatası:', err);
     }
+  }
 
-    function renderSummaryView() {
-      const container = document.getElementById('personSummaryCards');
-      const uniquePersons = [...new Set(window.installments.map(i => i.person))];
-
-      let html = '';
-      uniquePersons.forEach(person => {
-        const personItems = window.installments.filter(i => i.person === person);
-        const color = getPersonColor(person);
-        const personPhone = personItems.find(i => i.phone)?.phone || '';
-
-        let totalRemaining = 0;
-        let total4th = 0;
-        let total14th = 0;
-
-        personItems.forEach(item => {
-          const monthly = item.totalAmount / item.totalInstallments;
-          const remainingCount = item.totalInstallments - item.paidInstallments;
-          totalRemaining += (monthly * remainingCount);
-
-          if (remainingCount > 0) {
-            if (item.paymentDay === 4) total4th += monthly;
-            if (item.paymentDay === 14) total14th += monthly;
-          }
-        });
-
-        html += `
-          <div class="glass-card rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between mb-3">
-                <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-extrabold border ${color.border} ${color.bg} ${color.text}">
-                  <span class="w-2.5 h-2.5 rounded-full ${color.dot}"></span>
-                  ${person}
-                </span>
-                <span class="text-xs text-slate-400 font-medium">${personItems.length} Ürün</span>
-              </div>
-
-              ${personPhone ? `
-                <div class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mb-3 font-medium">
-                  <i data-lucide="phone" class="w-3.5 h-3.5 text-slate-400"></i> ${personPhone}
-                </div>
-              ` : ''}
-
-              <div class="space-y-2 mt-2">
-                <div class="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl flex items-center justify-between">
-                  <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">Toplam Kalan Borç</span>
-                  <span class="text-base font-extrabold text-slate-900 dark:text-white">${formatCurrency(totalRemaining)}</span>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                  <div class="p-2.5 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900">
-                    <span class="block text-[10px] text-blue-700 dark:text-blue-300 font-bold uppercase">4'ü Günü Toplamı</span>
-                    <span class="font-extrabold text-blue-900 dark:text-blue-200 text-sm">${formatCurrency(total4th)}</span>
-                  </div>
-                  <div class="p-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-900">
-                    <span class="block text-[10px] text-amber-700 dark:text-amber-300 font-bold uppercase">14'ü Günü Toplamı</span>
-                    <span class="font-extrabold text-amber-900 dark:text-amber-200 text-sm">${formatCurrency(total14th)}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Taksitli Ürünleri</span>
-                <div class="space-y-1.5 max-h-36 overflow-y-auto custom-scrollbar">
-                  ${personItems.map(item => `
-                    <div class="text-xs flex items-center justify-between p-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">
-                      <span class="text-slate-700 dark:text-slate-300 font-medium truncate max-w-[160px]">${item.title}</span>
-                      <span class="text-[11px] font-bold text-slate-500">${item.paidInstallments}/${item.totalInstallments} (${item.paymentDay}'ü)</span>
-                    </div>
-                  `).join('')}
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-              <button onclick="sendTotalWhatsAppReminder('${person}', '${personPhone}', ${total4th}, ${total14th}, ${totalRemaining})" class="w-full flex items-center justify-center gap-1.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-sm">
-                <i data-lucide="message-square" class="w-4 h-4"></i>
-                <span>Toplu WhatsApp Hesabı Gönder</span>
-              </button>
-            </div>
-          </div>
-        `;
-      });
-
-      container.innerHTML = html;
-      lucide.createIcons();
-    }
-
-    function markInstallmentPaid(id) {
-      const item = window.installments.find(i => i.id === id);
-      if (!item) return;
-
-      if (item.paidInstallments < item.totalInstallments) {
-        item.paidInstallments++;
-        const monthly = item.totalAmount / item.totalInstallments;
-        item.history.push({
-          date: new Date().toISOString().split('T')[0],
-          amount: monthly
-        });
-        saveToServer(item);
-        showToast(`${item.person} için 1 taksit ödendi işaretlendi (${formatCurrency(monthly)})`);
-        updateDashboard();
-      }
-    }
-
-    function deleteInstallment(id) {
-      window.installments = window.installments.filter(i => i.id !== id);
-      deleteFromServer(id);
-      showToast("Kayıt başarıyla silindi");
-      updateDashboard();
-    }
-
-    function normalizePhoneNumber(raw) {
-      if (!raw) return '';
-      let clean = raw.replace(/\D/g, '');
-      if (clean.startsWith('0')) clean = '90' + clean.slice(1);
-      if (clean.length === 10) clean = '90' + clean;
-      return clean;
-    }
-
-    function sendWhatsAppReminder(id) {
-      const item = window.installments.find(i => i.id === id);
-      if (!item) return;
-      const monthly = item.totalAmount / item.totalInstallments;
-      const remaining = item.totalInstallments - item.paidInstallments;
-
-      const message = `Selam ${item.person}, senin için aldığımız "${item.title}" ürününün ayın ${item.paymentDay}'ü olan taksiti geldi. Aylık tutar: ${formatCurrency(monthly)}. Kalan taksit: ${remaining}. Müsait olduğunda gönderebilirsen sevinirim, teşekkürler!`;
-      
-      copyAndOpenWhatsApp(message, item.phone);
-    }
-
-    function sendTotalWhatsAppReminder(person, phone, due4th, due14th, totalRemaining) {
-      let detail = '';
-      if (due4th > 0 && due14th > 0) {
-        detail = `Ayın 4'ü olan ödemen: ${formatCurrency(due4th)}, Ayın 14'ü olan ödemen: ${formatCurrency(due14th)}.`;
-      } else if (due4th > 0) {
-        detail = `Ayın 4'ü olan ödemen: ${formatCurrency(due4th)}.`;
-      } else if (due14th > 0) {
-        detail = `Ayın 14'ü olan ödemen: ${formatCurrency(due14th)}.`;
-      } else {
-        detail = `Şu an vadesi gelen taksitin yok. Toplam kalan bakiye: ${formatCurrency(totalRemaining)}.`;
-      }
-
-      const message = `Selam ${person}, taksit hesap özetin: ${detail} Toplam kalan: ${formatCurrency(totalRemaining)}. Kolay gelsin!`;
-      copyAndOpenWhatsApp(message, phone);
-    }
-
-    function copyAndOpenWhatsApp(text, rawPhone = '') {
-      const tempInput = document.createElement("textarea");
-      tempInput.value = text;
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand("copy");
-      document.body.removeChild(tempInput);
-
-      showToast("Mesaj panoya kopyalandı! WhatsApp açılıyor...");
-      const encoded = encodeURIComponent(text);
-      const cleanPhone = normalizePhoneNumber(rawPhone);
-      
-      setTimeout(() => {
-        if (cleanPhone) {
-          window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encoded}`, '_blank');
-        } else {
-          window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
-        }
-      }, 700);
-    }
-
-    function openManualModal() {
-      document.getElementById('mStartDate').value = new Date().toISOString().split('T')[0];
-      document.getElementById('manualModal').classList.remove('hidden');
-    }
-
-    function closeManualModal() {
-      document.getElementById('manualModal').classList.add('hidden');
-      document.getElementById('manualForm').reset();
-    }
-
-    function handleManualSubmit(e) {
-      e.preventDefault();
-      const person = document.getElementById('mPerson').value.trim();
-      const phone = document.getElementById('mPhone').value.trim();
-      const title = document.getElementById('mTitle').value.trim();
-      const platform = document.getElementById('mPlatform').value;
-      const totalAmount = parseFloat(document.getElementById('mTotalAmount').value);
-      const totalInstallments = parseInt(document.getElementById('mTotalInstallments').value, 10);
-      const paidInstallments = parseInt(document.getElementById('mPaidInstallments').value, 10) || 0;
-      const paymentDay = parseInt(document.querySelector('input[name="mPaymentDay"]:checked').value, 10);
-      const startDate = document.getElementById('mStartDate').value;
-
-      const newItem = {
-        id: 'inst-' + Date.now(),
-        person,
-        phone,
-        title,
-        platform,
-        totalAmount,
-        totalInstallments,
-        paidInstallments,
-        paymentDay,
-        startDate,
-        history: []
-      };
-
-      window.installments.unshift(newItem);
-      saveToServer(newItem);
-      closeManualModal();
-      showToast(`${person} adına taksit kaydedildi!`);
-      updateDashboard();
-    }
-
-    // AI Modal İşlemleri
-    function openAiModal() {
-      document.getElementById('aiModal').classList.remove('hidden');
-      removeSelectedImage();
-      document.getElementById('aiTextPrompt').value = '';
-    }
-
-    function closeAiModal() {
-      document.getElementById('aiModal').classList.add('hidden');
-      removeSelectedImage();
-    }
-
-    function handleImageSelection(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        selectedBase64Image = e.target.result;
-        document.getElementById('imagePreview').src = selectedBase64Image;
-        document.getElementById('dropZonePlaceholder').classList.add('hidden');
-        document.getElementById('previewContainer').classList.remove('hidden');
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function removeSelectedImage() {
-      selectedBase64Image = null;
-      document.getElementById('aiFileInput').value = '';
-      document.getElementById('dropZonePlaceholder').classList.remove('hidden');
-      document.getElementById('previewContainer').classList.add('hidden');
-      document.getElementById('imagePreview').src = '';
-    }
-
-    async function processAiExtraction() {
-      const statusBox = document.getElementById('aiStatus');
-      const statusText = document.getElementById('aiStatusText');
-      const submitBtn = document.getElementById('aiSubmitBtn');
-      const personHint = document.getElementById('aiPersonHint').value.trim();
-      const phoneHint = document.getElementById('aiPhoneHint').value.trim();
-      const preferredDay = parseInt(document.querySelector('input[name="aiPayDay"]:checked').value, 10);
-      const textPrompt = document.getElementById('aiTextPrompt').value.trim();
-
-      if (!selectedBase64Image && !textPrompt) {
-        showToast("Lütfen bir ekran görüntüsü yükleyin veya açıklama yazın!", true);
-        return;
-      }
-
-      statusBox.classList.remove('hidden');
-      submitBtn.disabled = true;
-      statusText.innerText = "Gemini yapay zekası sipariş detaylarını analiz ediyor...";
-
-      const systemPrompt = `Sen Türkiye e-ticaret siteleri (Trendyol, Hepsiburada, Amazon vb.) fatura, sipariş ekran görüntüsü ve taksit bilgisi uzmanısın.
-Gelen görselden veya metinden ürünün adını, toplam tutarını (TL), taksit sayısını ve hangi platform olduğunu tam olarak çıkarıp JSON olarak döndürmelisin.
-Kişi adı veya telefon belirtilmişse ekle. Ödeme günü 4 veya 14 olmalı.`;
-
-      const userInstruction = `Bu görseli ve notu incele:
-Kişi Adı Notu: "${personHint}"
-Telefon Notu: "${phoneHint}"
-Ödeme günü tercihi: ${preferredDay} (4 veya 14)
-Kullanıcı metni: "${textPrompt}"
-
-Lütfen şu JSON formatında yanıt ver:
-{
-  "person": "Kişi adı",
-  "phone": "Telefon numarası veya boş",
-  "title": "Ürün adı (kısa ve net)",
-  "platform": "Trendyol veya Hepsiburada veya Diğer",
-  "totalAmount": 1500.0,
-  "totalInstallments": 3,
-  "paymentDay": 4
-}`;
-
-      try {
-        const apiKey = ""; // İsteğe bağlı Gemini API anahtarınızı buraya yazabilirsiniz
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-
-        let parts = [{ text: userInstruction }];
-
-        if (selectedBase64Image) {
-          const pureBase64 = selectedBase64Image.split(',')[1];
-          const mime = selectedBase64Image.split(';')[0].split(':')[1] || 'image/jpeg';
-          parts.push({
-            inlineData: {
-              mimeType: mime,
-              data: pureBase64
-            }
-          });
-        }
-
-        const payload = {
-          contents: [{ parts }],
-          systemInstruction: { parts: [{ text: systemPrompt }] },
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: "OBJECT",
-              properties: {
-                person: { type: "STRING" },
-                phone: { type: "STRING" },
-                title: { type: "STRING" },
-                platform: { type: "STRING" },
-                totalAmount: { type: "NUMBER" },
-                totalInstallments: { type: "INTEGER" },
-                paymentDay: { type: "INTEGER" }
-              },
-              required: ["person", "title", "platform", "totalAmount", "totalInstallments", "paymentDay"]
-            }
-          }
-        };
-
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-          throw new Error("API isteği başarısız oldu.");
-        }
-
-        const result = await response.json();
-        const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        if (!jsonText) throw new Error("Yanıttan metin çıkarılamadı.");
-
-        const parsed = JSON.parse(jsonText);
-
-        const newInstallment = {
-          id: 'inst-' + Date.now(),
-          person: parsed.person || personHint || 'Arkadaşım',
-          phone: parsed.phone || phoneHint || '',
-          title: parsed.title || 'Sipariş Detayı',
-          platform: parsed.platform || 'Trendyol',
-          totalAmount: Number(parsed.totalAmount) || 1000,
-          totalInstallments: Math.max(1, Number(parsed.totalInstallments) || 3),
-          paidInstallments: 0,
-          paymentDay: (parsed.paymentDay === 14 || preferredDay === 14) ? 14 : 4,
-          startDate: new Date().toISOString().split('T')[0],
-          history: []
-        };
-
-        window.installments.unshift(newInstallment);
-        saveToServer(newInstallment);
-        closeAiModal();
-        showToast(`AI Başarılı! "${newInstallment.title}" eklendi ve kaydedildi.`);
-        updateDashboard();
-
-      } catch (err) {
-        console.warn("AI fallback devrede:", err);
-        const fallbackItem = {
-          id: 'inst-' + Date.now(),
-          person: personHint || 'Arkadaşım',
-          phone: phoneHint || '',
-          title: textPrompt ? textPrompt.slice(0, 35) : 'Trendyol / Hepsiburada Siparişi',
-          platform: 'Trendyol',
-          totalAmount: 3600,
-          totalInstallments: 6,
-          paidInstallments: 0,
-          paymentDay: preferredDay,
-          startDate: new Date().toISOString().split('T')[0],
-          history: []
-        };
-        window.installments.unshift(fallbackItem);
-        saveToServer(fallbackItem);
-        closeAiModal();
-        showToast(`Sipariş eklendi ve kaydedildi! (${fallbackItem.person})`);
-        updateDashboard();
-      } finally {
-        statusBox.classList.add('hidden');
-        submitBtn.disabled = false;
-      }
-    }
-
-    function exportDataJson() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.installments, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `arkadas_taksitler_${new Date().toISOString().split('T')[0]}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-      showToast("Taksit verileriniz JSON olarak indirildi.");
-    }
-
-    function importDataJson(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = async function(e) {
-        try {
-          const imported = JSON.parse(e.target.result);
-          if (Array.isArray(imported)) {
-            window.installments = imported;
-            for (const item of imported) {
-              await saveToServer(item);
-            }
-            updateDashboard();
-            showToast(`${imported.length} adet taksit başarıyla geri yüklendi!`);
-          } else {
-            showToast("Geçersiz yedek dosyası biçimi!", true);
-          }
-        } catch (err) {
-          showToast("Dosya okunurken hata oluştu!", true);
-        }
-      };
-      reader.readAsText(file);
-      event.target.value = '';
-    }
-
-    window.onload = function() {
-      initTheme();
-      loadDataFromServer();
-      lucide.createIcons();
+  // 4. Yeni Taksit Kaydet
+  async function saveInstallment(e) {
+    e.preventDefault();
+    const payload = {
+      id: 'inst_' + Date.now(),
+      person: document.getElementById('person').value,
+      phone: document.getElementById('phone').value,
+      platform: document.getElementById('platform').value,
+      title: document.getElementById('title').value,
+      totalAmount: parseFloat(document.getElementById('totalAmount').value),
+      totalInstallments: parseInt(document.getElementById('totalInstallments').value),
+      paidInstallments: 0,
+      paymentDay: parseInt(document.getElementById('paymentDay').value),
+      startDate: document.getElementById('startDate').value,
+      history: []
     };
-  </script>
+
+    try {
+      const res = await fetch('/api/installments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        document.getElementById('installmentForm').reset();
+        document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+        loadInstallments();
+      }
+    } catch (err) {
+      alert('Kaydedilirken hata oluştu!');
+    }
+  }
+
+  // 5. Taksit Sil
+  async function deleteInstallment(id) {
+    if (!confirm('Bu taksiti silmek istediğine emin misin?')) return;
+    try {
+      const res = await fetch(`/api/installments/${id}`, { method: 'DELETE' });
+      if (res.ok) loadInstallments();
+    } catch (err) {
+      alert('Silme hatası!');
+    }
+  }
+
+  // 6. Mobilde Fiş Okuma
+  async function processReceipt(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const ocrStatus = document.getElementById('ocrStatus');
+    ocrStatus.style.display = 'block';
+
+    try {
+      const { data: { text } } = await Tesseract.recognize(file, 'tur', {
+        logger: m => {
+          if (m.status === 'recognizing text') {
+            ocrStatus.innerText = `Fiş taranıyor: %${Math.round(m.progress * 100)}`;
+          }
+        }
+      });
+
+      ocrStatus.innerText = 'Bilgiler çıkarılıyor...';
+      const matches = text.match(/\d+[\.,]\d{2}/g);
+      if (matches && matches.length > 0) {
+        const lastNumber = matches[matches.length - 1].replace(',', '.');
+        document.getElementById('totalAmount').value = parseFloat(lastNumber);
+      }
+      
+      document.getElementById('title').value = 'Fiş: ' + text.slice(0, 18).trim();
+      ocrStatus.style.display = 'none';
+      alert('Fiş tarandı ve tutar kutucuğa aktarıldı!');
+    } catch (err) {
+      console.error(err);
+      ocrStatus.style.display = 'none';
+      alert('Fiş okunamadı, bilgileri elle girebilirsin.');
+    }
+  }
+
+  loadInstallments();
+</script>
 </body>
 </html>
