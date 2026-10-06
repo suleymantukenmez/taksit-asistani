@@ -3,52 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Taksit & Tahsilat Asistanı</title>
+  <title>Taksit ve Tahsilat Asistanı</title>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     :root {
-      --bg: #0b1329;
-      --card-bg: #1e293b;
-      --card-inner: #131d33;
-      --border: #334155;
+      --bg: #090d16;
+      --card: #131b2e;
+      --card-inner: #1c2640;
+      --border: #233354;
       --primary: #38bdf8;
-      --primary-hover: #0284c7;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
+      --accent: #818cf8;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
       --success: #22c55e;
       --danger: #ef4444;
-      --whatsapp: #25d366;
+      --wa: #25d366;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background: var(--bg); color: var(--text); padding: 14px; display: flex; justify-content: center; }
-    .container { width: 100%; max-width: 640px; padding-bottom: 40px; }
-    header { text-align: center; margin-bottom: 18px; }
-    h1 { font-size: 1.45rem; color: var(--primary); font-weight: 700; }
-    .status-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; padding: 4px 10px; border-radius: 9999px; background: rgba(56, 189, 248, 0.15); color: var(--primary); margin-top: 6px; font-weight: 600; }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
-    .ocr-box { background: rgba(56, 189, 248, 0.08); border: 1px dashed var(--primary); border-radius: 10px; padding: 12px; margin-bottom: 16px; text-align: center; }
-    .file-label-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: #2563eb; color: #fff; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
-    .ocr-status { display: none; font-size: 0.8rem; color: var(--primary); margin-top: 8px; font-weight: 500; }
+    .container { width: 100%; max-width: 900px; padding-bottom: 50px; }
+    header { text-align: center; margin-bottom: 20px; }
+    h1 { font-size: 1.6rem; color: var(--primary); font-weight: 800; letter-spacing: -0.5px; }
+    .status-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; padding: 4px 12px; border-radius: 9999px; background: rgba(56, 189, 248, 0.15); color: var(--primary); margin-top: 6px; font-weight: 600; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+    /* Özet Sayaçları */
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+    .stat-title { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
+    .stat-val { font-size: 1.3rem; font-weight: 700; color: var(--primary); margin-top: 4px; }
+
+    /* Form ve Kart Alanı */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
     .form-group { margin-bottom: 12px; }
-    label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
-    input, select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 0.95rem; outline: none; }
+    label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+    input, select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: #0b1120; color: var(--text); font-size: 0.95rem; outline: none; }
     input:focus, select:focus { border-color: var(--primary); }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .input-btn-group { display: flex; gap: 6px; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.95rem; }
-    .btn-primary { background: var(--primary); color: #0b1329; margin-top: 6px; }
-    .btn-contact { background: #4f46e5; color: #fff; width: auto; padding: 0 12px; font-size: 0.8rem; white-space: nowrap; border-radius: 8px; border: none; cursor: pointer; }
-    .section-title { font-size: 1.1rem; color: var(--text); margin-bottom: 12px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-    .item-card { background: var(--card-inner); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
-    .item-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-    .item-title { font-weight: 600; font-size: 0.95rem; }
-    .item-badge { background: #0284c7; color: #fff; padding: 2px 7px; border-radius: 4px; font-size: 0.7rem; margin-right: 6px; }
-    .item-info { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
-    .item-highlight { color: var(--primary); font-weight: 600; }
-    .item-actions { display: flex; gap: 8px; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); }
-    .btn-action { flex: 1; padding: 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; text-decoration: none; }
-    .btn-wa { background: var(--whatsapp); color: #0b1329; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; font-size: 0.95rem; }
+    .btn-primary { background: var(--primary); color: #090d16; margin-top: 6px; }
+    .btn-contact { background: #4f46e5; color: #fff; width: auto; padding: 0 12px; font-size: 0.85rem; border-radius: 8px; border: none; cursor: pointer; white-space: nowrap; }
+
+    /* OCR Butonu */
+    .ocr-box { background: rgba(56, 189, 248, 0.05); border: 1px dashed var(--primary); border-radius: 10px; padding: 12px; margin-bottom: 16px; text-align: center; }
+    .file-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: #2563eb; color: #fff; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
+    .ocr-status { display: none; font-size: 0.8rem; color: var(--primary); margin-top: 8px; }
+
+    /* Ayın 4'ü ve 14'ü Kolonları */
+    .groups-wrapper { display: grid; grid-template-columns: 1fr; gap: 20px; }
+    @media (min-width: 768px) {
+      .groups-wrapper { grid-template-columns: 1fr 1fr; }
+    }
+    .group-column { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+    .group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+    .group-title { font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .group-pill { font-size: 0.75rem; padding: 3px 8px; border-radius: 6px; background: var(--card-inner); color: var(--primary); }
+
+    /* Taksit Kartları */
+    .item-card { background: var(--card-inner); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+    .item-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+    .item-title { font-weight: 700; font-size: 0.95rem; }
+    .item-badge { background: #0284c7; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-right: 6px; }
+    .item-amount { color: var(--primary); font-weight: 700; font-size: 1rem; }
+    .item-meta { font-size: 0.8rem; color: var(--muted); margin-bottom: 10px; line-height: 1.4; }
+    .item-actions { display: flex; gap: 6px; }
+    .btn-act { flex: 1; padding: 7px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; text-decoration: none; }
+    .btn-wa { background: var(--wa); color: #090d16; }
     .btn-del { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
   </style>
 </head>
@@ -57,27 +78,42 @@
   <header>
     <h1>Taksit & Tahsilat Asistanı</h1>
     <div id="status" class="status-badge">
-      <span class="status-dot"></span>
+      <span class="dot"></span>
       <span id="statusText">Sunucu Kontrol Ediliyor...</span>
     </div>
   </header>
 
-  <!-- FİŞ / MAKBUZ TARAMA KUTUSU -->
+  <!-- Özet Kartları -->
+  <div class="summary-grid">
+    <div class="stat-card">
+      <div class="stat-title">Ayın 4'ü Toplamı</div>
+      <div class="stat-val" id="totalDay4">0 TL</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">Ayın 14'ü Toplamı</div>
+      <div class="stat-val" id="totalDay14">0 TL</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-title">Genel Kalan Tahsilat</div>
+      <div class="stat-val" id="totalAll">0 TL</div>
+    </div>
+  </div>
+
+  <!-- Fiş Tarama ve Ekleme Formu -->
   <div class="card">
     <div class="ocr-box">
       <input type="file" id="receiptFileInput" accept="image/*" style="display: none;" onchange="processReceipt(event)">
-      <label for="receiptFileInput" class="file-label-btn">
+      <label for="receiptFileInput" class="file-btn">
         📷 Fiş / Makbuz Tara (Kamera / Galeri)
       </label>
-      <div id="ocrStatus" class="ocr-status">Fiş taranıyor, bekleyin...</div>
+      <div id="ocrStatus" class="ocr-status">Fiş okunuyor, lütfen bekleyin...</div>
     </div>
 
-    <!-- TAKSİT EKLEME FORMU -->
     <form id="installmentForm" onsubmit="saveInstallment(event)">
       <div class="form-group">
         <label>Kişi / Borçlu Adı</label>
         <div class="input-btn-group">
-          <input type="text" id="person" required placeholder="Örn: Ahmet Yılmaz">
+          <input type="text" id="person" required placeholder="Örn: Zafer Abi">
           <button type="button" id="btnPickContact" class="btn-contact" onclick="pickContact()">
             📇 Rehberden
           </button>
@@ -94,7 +130,8 @@
           <select id="platform">
             <option value="Trendyol">Trendyol</option>
             <option value="Hepsiburada">Hepsiburada</option>
-            <option value="Elden">Elden Satış</option>
+            <option value="Amazon">Amazon</option>
+            <option value="Elden">Elden</option>
             <option value="Diğer">Diğer</option>
           </select>
         </div>
@@ -102,7 +139,7 @@
 
       <div class="form-group">
         <label>Açıklama / Ürün Başlığı</label>
-        <input type="text" id="title" required placeholder="Örn: Telefon / Mobilya">
+        <input type="text" id="title" required placeholder="Örn: Ayakkabı / Saat">
       </div>
 
       <div class="grid-2">
@@ -118,8 +155,13 @@
 
       <div class="grid-2">
         <div class="form-group">
-          <label>Ödeme Günü (Ayın)</label>
-          <input type="number" id="paymentDay" required min="1" max="31" value="1">
+          <label>Ödeme Günü (Grup)</label>
+          <select id="paymentDay">
+            <option value="4">Ayın 4'ü</option>
+            <option value="14">Ayın 14'ü</option>
+            <option value="1">Ayın 1'i</option>
+            <option value="15">Ayın 15'i</option>
+          </select>
         </div>
         <div class="form-group">
           <label>Başlangıç Tarihi</label>
@@ -131,24 +173,37 @@
     </form>
   </div>
 
-  <div class="section-title">
-    <span>Kayıtlı Taksitler</span>
-    <span id="totalCount" style="font-size: 0.85rem; color: var(--text-muted);"></span>
+  <!-- AYIN 4'Ü VE AYIN 14'Ü GRUPLARI -->
+  <div class="groups-wrapper">
+    <!-- AYIN 4'Ü KOLONU -->
+    <div class="group-column">
+      <div class="group-header">
+        <div class="group-title">📅 Ayın 4'ü Grubu</div>
+        <span class="group-pill" id="countDay4">0 Kişi</span>
+      </div>
+      <div id="listDay4"></div>
+    </div>
+
+    <!-- AYIN 14'Ü VE DİĞERLERİ KOLONU -->
+    <div class="group-column">
+      <div class="group-header">
+        <div class="group-title">📅 Ayın 14'ü Grubu</div>
+        <span class="group-pill" id="countDay14">0 Kişi</span>
+      </div>
+      <div id="listDay14"></div>
+    </div>
   </div>
-  
-  <div id="listContainer"></div>
 </div>
 
 <script>
   document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
 
-  // Rehber desteği kontrolü (Rehber API yoksa butonu gizler)
   if (!('contacts' in navigator && 'ContactsManager' in window)) {
     const btn = document.getElementById('btnPickContact');
     if (btn) btn.style.display = 'none';
   }
 
-  // 1. Telefondan Rehber Seçimi
+  // 1. Rehberden Seçim
   async function pickContact() {
     try {
       const contacts = await navigator.contacts.select(['name', 'tel'], { multiple: false });
@@ -165,7 +220,7 @@
     }
   }
 
-  // 2. WhatsApp Yönlendirmesi (Sayfadan düşmeden güvenle açar)
+  // 2. WhatsApp Gönder
   function sendWhatsApp(phone, person, title, total, day) {
     if (!phone) {
       alert('Kayıtlı telefon numarası bulunamadı!');
@@ -175,12 +230,11 @@
     if (clean.startsWith('0')) clean = '90' + clean.substring(1);
     if (!clean.startsWith('90')) clean = '90' + clean;
 
-    const msg = `Merhaba ${person}, ${title} alışverişinize ait taksit tutarı: ${total} TL. Her ayın ${day}. günü ödenmektedir. Bilginize sunarız.`;
-    const url = `https://wa.me/${clean}?text=${encodeURIComponent(msg)}`;
-    window.open(url, '_blank');
+    const msg = `Selam ${person}, ${title} alışverişinin taksit ödemesi yaklaşıyor.\nTutar: ${total} TL\nÖdeme Günü: Ayın ${day}. günü.\nBilgin olsun.`;
+    window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank');
   }
 
-  // 3. Taksitleri Listeleme & Sunucu Durumu Kontrolü
+  // 3. Taksitleri Gruplu Listele (Ayın 4'ü ve Ayın 14'ü)
   async function loadInstallments() {
     const statusBox = document.getElementById('status');
     const statusText = document.getElementById('statusText');
@@ -188,56 +242,67 @@
     try {
       const res = await fetch('/api/installments');
       if (!res.ok) throw new Error('Sunucu hatası: ' + res.status);
-      
       const data = await res.json();
 
-      // Durum: Yeşil Aktif
       statusBox.style.background = 'rgba(34, 197, 94, 0.15)';
       statusBox.style.color = 'var(--success)';
       statusText.innerText = 'Sunucu & Veritabanı Aktif';
 
-      const container = document.getElementById('listContainer');
-      const totalCount = document.getElementById('totalCount');
-      container.innerHTML = '';
+      const list4 = document.getElementById('listDay4');
+      const list14 = document.getElementById('listDay14');
+      list4.innerHTML = '';
+      list14.innerHTML = '';
 
-      if (!data || data.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px;">Kayıtlı taksit bulunmuyor.</p>';
-        totalCount.innerText = '0 Kayıt';
-        return;
-      }
-
-      totalCount.innerText = `${data.length} Kayıt`;
+      let sum4 = 0, sum14 = 0, count4 = 0, count14 = 0;
 
       data.forEach(item => {
-        const total = item.totalamount || item.totalAmount || 0;
-        const paid = item.paidinstallments || item.paidInstallments || 0;
-        const count = item.totalinstallments || item.totalInstallments || 1;
-        const day = item.paymentday || item.paymentDay || 1;
+        const total = Number(item.totalamount || item.totalAmount || 0);
+        const day = Number(item.paymentday || item.paymentDay || 4);
+        const paid = Number(item.paidinstallments || item.paidInstallments || 0);
+        const count = Number(item.totalinstallments || item.totalInstallments || 1);
         const phone = item.phone || '';
 
-        const div = document.createElement('div');
-        div.className = 'item-card';
-        div.innerHTML = `
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
           <div class="item-top">
             <div class="item-title"><span class="item-badge">${item.platform || 'Genel'}</span>${item.person}</div>
-            <div class="item-highlight">${total} TL</div>
+            <div class="item-amount">${total.toLocaleString('tr-TR')} TL</div>
           </div>
-          <div class="item-info">
+          <div class="item-meta">
             <div><strong>Ürün:</strong> ${item.title}</div>
-            <div><strong>Durum:</strong> ${paid} / ${count} Taksit Ödendi | <strong>Ödeme Günü:</strong> Ayın ${day}'i</div>
-            ${phone ? `<div><strong>Telefon:</strong> ${phone}</div>` : ''}
+            <div><strong>Durum:</strong> ${paid}/${count} Taksit | <strong>Gün:</strong> Ayın ${day}'i</div>
+            ${phone ? `<div><strong>Tel:</strong> ${phone}</div>` : ''}
           </div>
           <div class="item-actions">
-            <button type="button" class="btn-action btn-wa" onclick="sendWhatsApp('${phone}', '${item.person}', '${item.title}', '${total}', '${day}')">
-              💬 WhatsApp'a Gönder
+            <button class="btn-act btn-wa" onclick="sendWhatsApp('${phone}', '${item.person}', '${item.title}', '${total}', '${day}')">
+              💬 WhatsApp
             </button>
-            <button type="button" class="btn-action btn-del" onclick="deleteInstallment('${item.id}')">
+            <button class="btn-act btn-del" onclick="deleteInstallment('${item.id}')">
               🗑️ Sil
             </button>
           </div>
         `;
-        container.appendChild(div);
+
+        if (day === 4) {
+          list4.appendChild(card);
+          sum4 += total;
+          count4++;
+        } else {
+          list14.appendChild(card);
+          sum14 += total;
+          count14++;
+        }
       });
+
+      if (count4 === 0) list4.innerHTML = '<p style="color:var(--muted); font-size:0.85rem; text-align:center; padding:12px;">Ayın 4\'ü için kayıt yok.</p>';
+      if (count14 === 0) list14.innerHTML = '<p style="color:var(--muted); font-size:0.85rem; text-align:center; padding:12px;">Ayın 14\'ü için kayıt yok.</p>';
+
+      document.getElementById('totalDay4').innerText = sum4.toLocaleString('tr-TR') + ' TL';
+      document.getElementById('totalDay14').innerText = sum14.toLocaleString('tr-TR') + ' TL';
+      document.getElementById('totalAll').innerText = (sum4 + sum14).toLocaleString('tr-TR') + ' TL';
+      document.getElementById('countDay4').innerText = count4 + ' Kişi';
+      document.getElementById('countDay14').innerText = count14 + ' Kişi';
 
     } catch (err) {
       console.error(err);
@@ -275,13 +340,13 @@
         body: JSON.stringify(payload)
       });
 
-      if (!res.ok) throw new Error('Kaydetme başarısız');
+      if (!res.ok) throw new Error('Kaydetme hatası');
 
       document.getElementById('installmentForm').reset();
       document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
       await loadInstallments();
     } catch (err) {
-      alert('Kayıt sırasında hata oluştu: ' + err.message);
+      alert('Kayıt başarısız oldu!');
     } finally {
       btn.disabled = false;
       btn.innerText = '💾 Taksiti Kaydet';
@@ -295,11 +360,11 @@
       const res = await fetch(`/api/installments/${id}`, { method: 'DELETE' });
       if (res.ok) await loadInstallments();
     } catch (err) {
-      alert('Silme sırasında hata oluştu!');
+      alert('Silme hatası!');
     }
   }
 
-  // 6. Mobilde Fiş Okuma
+  // 6. Fiş Okuma
   async function processReceipt(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -316,22 +381,22 @@
         }
       });
 
-      ocrStatus.innerText = 'Tutar tespit ediliyor...';
+      ocrStatus.innerText = 'Tutar ayıklanıyor...';
       const matches = text.match(/\d+[\.,]\d{2}/g);
       if (matches && matches.length > 0) {
         const lastNumber = matches[matches.length - 1].replace(',', '.');
         document.getElementById('totalAmount').value = parseFloat(lastNumber);
       }
       
-      const cleanTitle = text.replace(/[^a-zA-Z0-9çğıöşüÇĞİÖŞÜ ]/g, ' ').trim().slice(0, 25);
+      const cleanTitle = text.replace(/[^a-zA-Z0-9çğıöşüÇĞİÖŞÜ ]/g, ' ').trim().slice(0, 20);
       if (cleanTitle) document.getElementById('title').value = cleanTitle;
 
       ocrStatus.style.display = 'none';
-      alert('Fiş başarıyla okundu!');
+      alert('Fiş okundu ve forma aktarıldı!');
     } catch (err) {
       console.error(err);
       ocrStatus.style.display = 'none';
-      alert('Fiş okunamadı, bilgileri el ile girebilirsin.');
+      alert('Fiş okunamadı.');
     }
   }
 
